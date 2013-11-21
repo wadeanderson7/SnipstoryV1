@@ -26,4 +26,5 @@ function restartSnipStory {
 	sudo play "start 80"
 }
 
+# automatically restart when deploying
 restartSnipStory
