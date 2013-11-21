@@ -25,3 +25,5 @@ function restartSnipStory {
 	echo "Restarting play"
 	sudo play "start 80"
 }
+
+restartSnipStory
