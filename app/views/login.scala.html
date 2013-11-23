@@ -1,0 +1,64 @@
+@(loginForm: Form[Application.Login], registerForm: Form[models.snipstory.User])
+@main("SnipStory") {
+
+    @helper.form(routes.Users.create) {
+	   <h1>Register</h1>
+		@if(registerForm.hasGlobalErrors) {
+		    <p class="error">
+		        @registerForm.globalError.message
+		    </p>
+		}
+		@if(flash.contains("logout")) {
+		    <p class="success">
+		        @flash.get("logout")
+		    </p>
+		}
+	   <p>
+	       <input type="text" name="name" placeholder="name" value="@registerForm("name").value">
+	   </p>
+	   <p>
+	       <input type="text" name="birthdate" placeholder="birthdate (mm/dd/yyyy)" value="@registerForm("birthdate").value">
+	   </p>
+	   <p>
+	       <input type="email" name="email" placeholder="email" value="@registerForm("email").value">
+	   </p>
+	   <p>
+	       <input type="password" name="password" placeholder="password">
+	   </p>
+	   <p>
+	       <input type="password" name="confirmPassword" placeholder="confirm password">
+	   </p>
+	   <p>
+	       <input type="hidden" name="passwordHash">
+	   </p>
+	   <p>
+	       <button type="submit">Create Account</button>
+	   </p>
+	}
+	
+	@helper.form(routes.Application.authenticate) {
+	   <h1>Sign In</h1>
+		@if(loginForm.hasGlobalErrors) {
+		    <p class="error">
+		        @registerForm.globalError.message
+		    </p>
+		}
+		@if(flash.contains("logout")) {
+		    <p class="success">
+		        @flash.get("logout")
+		    </p>
+		}	   
+	   <p>
+	       <input type="email" name="email" placeholder="email" value="@loginForm("email").value">
+	   </p>
+	   <p>
+	       <input type="password" name="password" placeholder="password">
+	   </p>
+	   <p>
+	       <input type="hidden" name="passwordHash">
+	   </p>
+	   <p>
+	       <button type="submit">Sign in</button>
+	   </p>
+	}
+}        

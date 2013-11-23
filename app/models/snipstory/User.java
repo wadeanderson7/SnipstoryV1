@@ -1,5 +1,9 @@
 package models.snipstory;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -20,6 +24,8 @@ import play.db.ebean.Model;
 public class User extends Model {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static Finder<Long, User> find = new Finder<Long, User>(Long.class, User.class);
 
 	@Id
 	public long id;
@@ -44,6 +50,9 @@ public class User extends Model {
 	@Column(length = 32, nullable = false)
 	public String salt;
 	
+	/**
+	 * SHA-256 Hash of SHA-256 Hash of password + salt
+	 */
 	@Column(length = 64)
 	public String saltedPasswordHash;
 	
@@ -62,4 +71,59 @@ public class User extends Model {
 	@MinLength(64)
 	@Transient
 	public String passwordHash;
+
+	public User(String email, String name, Date birthdate) {
+		this.email = email;
+		this.name = name;
+		this.birthdate = birthdate;
+		this.creation = new Date();
+		//generate secure random salt
+		SecureRandom rand = new SecureRandom();
+		byte[] randBytes = new byte[128];
+		rand.nextBytes(randBytes);
+		this.salt = bytesToHexString(randBytes);
+	}
+	
+	public String validate() {
+		//validating new user form input
+		//check for user based on email for duplicates
+		User existingUser = User.find.where().eq("email", email).findUnique();
+		if (existingUser == null) {
+			return "Account already exists for that email";
+		} else {
+			return null;
+		}
+    }
+		
+	public static User authenticate(String email, String passwordHash) {
+		User user = find.where().eq("email", email).findUnique();
+		if (user == null)
+			return null;
+		//check password hash
+		String saltedHash = saltPasswordHash(passwordHash, user.salt);
+		if (saltedHash.equals(user.saltedPasswordHash)) {
+			return user;
+		} else 
+			return null;
+    }
+
+	private static String saltPasswordHash(String passwordHash, String salt) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
+		byte [] hashBytes = digest.digest((passwordHash + salt).getBytes(StandardCharsets.UTF_8));
+		return bytesToHexString(hashBytes);
+	}
+	
+	private static String bytesToHexString(byte[] bytes) {
+		StringBuffer result = new StringBuffer();
+		for (byte b : bytes) {
+		    result.append(String.format("%02x", b));
+		}
+		return result.toString();
+	}
 }
