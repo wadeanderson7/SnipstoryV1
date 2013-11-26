@@ -1,0 +1,20 @@
+@(form: Form[Application.RecoverAccount])
+
+@main("Reset account password") {
+
+	<h1>Forgot your password?</h1>
+	<div>Enter your email address to have a password reset link mailed to you:</div>
+	@helper.form(routes.Users.recover) {
+	   @if(form.hasGlobalErrors) {
+		    <p class="error">
+		        @form.globalError.message
+		    </p>
+		}
+	   <p>
+	       <input type="email" name="email" placeholder="email" value="@form("email").value">
+	   </p>
+	   <p>
+	       <button type="submit">Recover account</button>
+	   </p>
+	}
+}

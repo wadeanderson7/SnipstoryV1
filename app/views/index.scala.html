@@ -1,7 +1,11 @@
-@(message: String)
+@(user: models.snipstory.User, message: String)
 
 @main("Welcome to Play") {
 
-    @play20.welcome(message, style = "Java")
+	<div><em>@message</em></div>
+	<div>Signed in as: @user.name (@user.email)</div>
+	<div><a href="@routes.Application.logout()">Sign out</a></div>
+	<div>TODO: rest of page</div>
+    @* @play20.welcome(message, style = "Java") *@
 
 }

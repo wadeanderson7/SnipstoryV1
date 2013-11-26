@@ -42,7 +42,7 @@ public class User extends Model {
 	public String name;
 	
 	@Required
-	@Formats.DateTime(pattern="dd/MM/yyyy")
+	@Formats.DateTime(pattern="MM/dd/yyyy")
 	@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
 	public Date birthdate;
@@ -63,6 +63,9 @@ public class User extends Model {
 	@Column(nullable = false)
 	public Date creation = new Date();
 	
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date activation;
+	
 	@Column(nullable = false)
 	public int numLogins = 0;
 		
@@ -77,18 +80,13 @@ public class User extends Model {
 		this.name = name;
 		this.birthdate = birthdate;
 		this.creation = new Date();
-		//generate secure random salt
-		SecureRandom rand = new SecureRandom();
-		byte[] randBytes = new byte[128];
-		rand.nextBytes(randBytes);
-		this.salt = bytesToHexString(randBytes);
 	}
 	
 	public String validate() {
 		//validating new user form input
 		//check for user based on email for duplicates
 		User existingUser = User.find.where().eq("email", email).findUnique();
-		if (existingUser == null) {
+		if (existingUser != null) {
 			return "Account already exists for that email";
 		} else {
 			return null;
@@ -125,5 +123,24 @@ public class User extends Model {
 		    result.append(String.format("%02x", b));
 		}
 		return result.toString();
+	}
+
+	public void prepForCreate() {
+		this.creation = new Date();
+		if (salt == null)
+			createSalt();
+	}
+	
+	public void createSalt() {
+		if (salt != null)
+			return;
+		//generate secure random salt
+		SecureRandom rand = new SecureRandom();
+		byte[] randBytes = new byte[16];
+		rand.nextBytes(randBytes);
+		this.salt = bytesToHexString(randBytes);
+		//set salted password Hash if needed
+		if (passwordHash != null)
+			saltedPasswordHash = saltPasswordHash(passwordHash, salt);
 	}
 }

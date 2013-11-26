@@ -1,0 +1,17 @@
+# Users
+
+- &bob !!models.User
+    email:              bob@example.com
+    name:               Bob Bryant
+    password:           secret
+    birthdate:          1977-08-15 00:00:00
+    salt:               56b6e7106de664d211ee68c335a8dca0
+    saltedPasswordHash: 4c6e0fd475c2d931823c518c89234a2eec1cd7c3c2d6198cac22cf6aa6f4b062 # testingbob
+
+- &jane !!models.User
+    email:              jane@example.com
+    name:               Jane Jefferson
+    password:           secret
+    birthdate:          2013-11-25 00:00:00
+    salt:               cb43ed600f0b3e84e66a5c8034edcc84
+    saltedPasswordHash: e47f6ed988e4c5b8e34b55a61208dec113cd76eb410d197426a14f748c3bb45c # testingjane

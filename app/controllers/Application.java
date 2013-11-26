@@ -12,16 +12,20 @@ public class Application extends Controller {
 
 	@Security.Authenticated(SignedIn.class)
     public static Result index() {
-        return ok(index.render("You are signed in."));
+		User user = User.find.byId(Long.parseLong(session().get("uid")));
+        return ok(index.render(user, "You are signed in."));
     }
     
     public static Result login() {
-    	return ok(login.render(form(Login.class), form(User.class)));
+    	if (session().get("uid") != null)
+    		return redirect(routes.Application.index());
+    	else
+    		return ok(login.render(form(Login.class), form(User.class)));
     }
     
     public static Result logout() {
     	session().clear();
-        flash("logout", "You've have signed out");
+        flash("login", "You have signed out");
         return redirect(
             routes.Application.login()
         );
@@ -40,13 +44,9 @@ public class Application extends Controller {
             );
         }
     }
-    
-    public static Result register() {
-    	return TODO;
-    }
-    
+        
     public static Result accountRecover() {
-    	return TODO;
+    	return ok(views.html.accountRecover.render(form(RecoverAccount.class)));
     }
     
     public static Result userInfo() {
@@ -65,6 +65,22 @@ public class Application extends Controller {
               return "Invalid email or password";
             }
             return null;
+        }
+    }
+    
+    public static class RecoverAccount {
+
+    	@Required
+        public String email;
+
+        public String validate() {
+        	if (User.find.where().eq("email", email).findRowCount() == 1) {
+        		return null;
+        	} else { 
+        		//TODO?: should we validate this? 
+        		//       (malicious user could look up if a particular email address exists in the system) 
+        		return "No account with that email exists";
+        	}
         }
     }
 }
