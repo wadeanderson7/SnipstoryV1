@@ -1,9 +1,12 @@
 package controllers;
 
 import static play.data.Form.form;
+
 import models.snipstory.User;
 import play.*;
 import play.data.Form;
+import play.data.validation.Constraints.MaxLength;
+import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Required;
 import play.mvc.*;
 import views.html.*;
@@ -36,9 +39,8 @@ public class Application extends Controller {
         if (loginForm.hasErrors()) {
             return badRequest(login.render(loginForm, form(User.class)));
         } else {
-            session().clear();
             User user = User.find.where().eq("email", loginForm.get().email).findUnique();
-            session("uid", Long.toString(user.id));
+            Users.setUpSession(user);
             return redirect(
                 routes.Application.index()
             );
@@ -47,6 +49,17 @@ public class Application extends Controller {
         
     public static Result accountRecover() {
     	return ok(views.html.accountRecover.render(form(RecoverAccount.class)));
+    }
+    
+    public static Result resetPassword(String resetToken) {
+    	User user = User.find.where().eq("reset_token", resetToken).findUnique();
+		//token only valid if exists in database and is not expired
+		if (user != null && !user.isResetTokenExpired()) {
+			return ok(views.html.resetPassword.render(user, form(ResetPassword.class)));
+		} else {
+			flash("message", "Reset link has expired, please try again");
+			return redirect(routes.Application.accountRecover());
+		}
     }
     
     public static Result userInfo() {
@@ -83,4 +96,12 @@ public class Application extends Controller {
         	}
         }
     }
+    
+    public static class ResetPassword {
+		
+		@Required
+		@MaxLength(64)
+		@MinLength(64)
+		public String passwordHash;
+	}
 }

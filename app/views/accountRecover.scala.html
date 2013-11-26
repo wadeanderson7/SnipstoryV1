@@ -1,6 +1,6 @@
 @(form: Form[Application.RecoverAccount])
 
-@main("Reset account password") {
+@main("Recover account") {
 
 	<h1>Forgot your password?</h1>
 	<div>Enter your email address to have a password reset link mailed to you:</div>
@@ -8,6 +8,11 @@
 	   @if(form.hasGlobalErrors) {
 		    <p class="error">
 		        @form.globalError.message
+		    </p>
+		}
+		@if(flash.contains("message")) {
+		    <p class="error">
+		        @flash.get("message")
 		    </p>
 		}
 	   <p>

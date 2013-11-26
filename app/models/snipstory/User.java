@@ -9,10 +9,12 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import controllers.Users;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.MaxLength;
@@ -26,6 +28,8 @@ public class User extends Model {
 	private static final long serialVersionUID = 1L;
 	
 	public static Finder<Long, User> find = new Finder<Long, User>(Long.class, User.class);
+	
+	public static final int RESET_TOKEN_VALID_MS = 3 * (60 * 60 * 1000);
 
 	@Id
 	public long id;
@@ -69,6 +73,12 @@ public class User extends Model {
 	@Column(nullable = false)
 	public int numLogins = 0;
 		
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date resetCreation;
+	
+	@Column(length = 64, unique = true)
+	public String resetToken;
+	
 	@Required
 	@MaxLength(64)
 	@MinLength(64)
@@ -92,6 +102,13 @@ public class User extends Model {
 			return null;
 		}
     }
+	
+	public static User authenticate(String resetToken) {
+		User user = find.where().eq("reset_token", resetToken).findUnique();
+		if (user == null)
+			return null;
+		return user;
+	}
 		
 	public static User authenticate(String email, String passwordHash) {
 		User user = find.where().eq("email", email).findUnique();
@@ -142,5 +159,42 @@ public class User extends Model {
 		//set salted password Hash if needed
 		if (passwordHash != null)
 			saltedPasswordHash = saltPasswordHash(passwordHash, salt);
+	}
+	
+	public void setNewPasswordViaReset(String passwordHash) {
+		resetToken = null;
+		resetCreation = null;
+		if (activation == null)
+			activation = new Date();
+		setNewPassword(passwordHash);
+	}
+	
+	public void verifyEmail() {
+		if (activation == null)
+			activation = new Date();
+		save();
+	}
+
+	public void setNewPassword(String passwordHash) {
+		saltedPasswordHash = saltPasswordHash(passwordHash, salt);
+		save();
+	}
+	
+	public void createResetToken() {
+		//generate secure random salt
+		SecureRandom rand = new SecureRandom();
+		byte[] randBytes = new byte[32];
+		rand.nextBytes(randBytes);
+		resetToken = bytesToHexString(randBytes);
+		resetCreation = new Date();
+		save();
+	}
+	
+	public boolean isResetTokenExpired() {
+		if (resetCreation != null) {
+			return new Date(resetCreation.getTime() + RESET_TOKEN_VALID_MS).before(new Date());
+		} else {
+			return true;
+		}
 	}
 }

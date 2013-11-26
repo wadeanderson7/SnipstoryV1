@@ -8,10 +8,13 @@ GET     /login                      controllers.Application.login()
 POST    /login                      controllers.Application.authenticate()
 GET     /logout                     controllers.Application.logout()
 GET     /accountRecover             controllers.Application.accountRecover()
+GET     /resetPassword/:token       controllers.Application.resetPassword(token: String)
 
 # Users model
 POST    /users						controllers.Users.create()
 POST    /accountRecover				controllers.Users.recover()
+POST    /resetPassword/:token       controllers.Users.resetPassword(token: String)
+GET     /verifyEmail/:token         controllers.Users.verifyEmail(token: String)
 PUT     /users/:id/passwordHash	    controllers.Users.setPasswordHash(id: Long)
 PUT     /users/:id				    controllers.Users.setInfo(id: Long)
 GET     /users/:id				    controllers.Users.getInfo(id: Long)
