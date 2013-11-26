@@ -1,4 +1,4 @@
-package models.snipstory;
+package models;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -9,12 +9,10 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import controllers.Users;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.MaxLength;
@@ -162,22 +160,24 @@ public class User extends Model {
 	}
 	
 	public void setNewPasswordViaReset(String passwordHash) {
-		resetToken = null;
-		resetCreation = null;
-		if (activation == null)
-			activation = new Date();
+		consumeResetToken();
 		setNewPassword(passwordHash);
 	}
 	
 	public void verifyEmail() {
-		if (activation == null)
+		consumeResetToken();
+	}
+
+	private void consumeResetToken() {
+		if (activation == null) {
 			activation = new Date();
-		save();
+		}
+		resetToken = null;
+		resetCreation = null;
 	}
 
 	public void setNewPassword(String passwordHash) {
 		saltedPasswordHash = saltPasswordHash(passwordHash, salt);
-		save();
 	}
 	
 	public void createResetToken() {
@@ -187,7 +187,6 @@ public class User extends Model {
 		rand.nextBytes(randBytes);
 		resetToken = bytesToHexString(randBytes);
 		resetCreation = new Date();
-		save();
 	}
 	
 	public boolean isResetTokenExpired() {

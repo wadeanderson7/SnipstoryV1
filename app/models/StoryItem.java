@@ -1,4 +1,4 @@
-package models.snipstory;
+package models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

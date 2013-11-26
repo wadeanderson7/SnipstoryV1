@@ -1,4 +1,4 @@
-package models.snipstory;
+package models;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import play.db.ebean.Model;
 import com.avaje.ebean.annotation.PrivateOwned;
 
 @Entity
-public class StoryChapter extends Model {
+public class StoryPage extends Model {
 
 	private static final long serialVersionUID = 1L;
 
@@ -23,16 +23,13 @@ public class StoryChapter extends Model {
 	
 	public String name;
 	
-	
-	public Integer startYear;
-	public Integer endYear;
-	
 	public long ordering;
 	
 	@ManyToOne
-	public LifeStory lifeStory;
+	public StoryChapter storyChapter;
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@PrivateOwned
-	List<StoryPage> pages;
+	public List<StoryItem> pages;
+		
 }

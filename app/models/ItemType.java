@@ -1,4 +1,4 @@
-package models.snipstory;
+package models;
 
 import com.avaje.ebean.annotation.EnumValue;
 

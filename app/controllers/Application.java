@@ -1,8 +1,7 @@
 package controllers;
 
 import static play.data.Form.form;
-
-import models.snipstory.User;
+import models.User;
 import play.*;
 import play.data.Form;
 import play.data.validation.Constraints.MaxLength;
@@ -41,6 +40,7 @@ public class Application extends Controller {
         } else {
             User user = User.find.where().eq("email", loginForm.get().email).findUnique();
             Users.setUpSession(user);
+            user.save();
             return redirect(
                 routes.Application.index()
             );

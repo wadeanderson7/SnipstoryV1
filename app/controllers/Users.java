@@ -1,10 +1,9 @@
 package controllers;
 
 import static play.data.Form.form;
-import models.snipstory.User;
+import models.User;
 import play.data.Form;
 import play.mvc.Controller;
-import play.mvc.Http.Request;
 import play.mvc.Result;
 
 import com.typesafe.plugin.MailerAPI;
@@ -25,9 +24,9 @@ public class Users extends Controller {
 		} else {
 			User newUser = filledForm.get();
 			newUser.prepForCreate();
-			newUser.save();
 			sendVerifyEmail(newUser);
 			Users.setUpSession(newUser);
+			newUser.save();
             return redirect(
                 routes.Application.index()
             );
@@ -46,11 +45,15 @@ public class Users extends Controller {
 			//change password and log in
 			user.setNewPasswordViaReset(form.get().passwordHash);
 			Users.setUpSession(user);
+			user.save();
 			return redirect(routes.Application.index());
 		}
 	}
 	
 	public static void setUpSession(User user) {
+		if (session().get("uid") == null) {
+			user.numLogins++;
+		}
 		session().clear();
 		session("uid", Long.toString(user.id));
 		session("start", Long.toString(System.currentTimeMillis()));
@@ -66,6 +69,7 @@ public class Users extends Controller {
     		
     		//generate reset token
     		user.createResetToken();
+    		user.save();
     		String url = routes.Users.resetPassword(user.resetToken).absoluteURL(request());
     		
     		//TODO: send email
@@ -85,6 +89,7 @@ public class Users extends Controller {
 	
 	public static void sendVerifyEmail(User user) {
 		user.createResetToken(); //TODO?: use separate token from reset token?
+		user.save();
 		String url = routes.Users.verifyEmail(user.resetToken).absoluteURL(request());
 		
 		//TODO: send email
@@ -105,6 +110,7 @@ public class Users extends Controller {
 		} else {
 			user.verifyEmail();
 			Users.setUpSession(user);
+			user.save();
 			flash("message","Your email address has been verified.");
 			return redirect(routes.Application.index());
 		}
