@@ -12,7 +12,7 @@ import views.html.*;
 
 public class Application extends Controller {
 
-	@Security.Authenticated(SignedIn.class)
+	@Security.Authenticated(UserSignedIn.class)
     public static Result index() {
 		User user = Users.getSessionUser();
         return ok(index.render(user, "You are signed in."));

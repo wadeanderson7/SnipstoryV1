@@ -12,14 +12,13 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
-public class StoryChapter extends Model implements JsonMappable {
+public class StoryChapter extends JsonMappableModel {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -43,7 +42,7 @@ public class StoryChapter extends Model implements JsonMappable {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@PrivateOwned
 	List<StoryPage> pages;
-
+	
 	@Override
 	public JsonNode toJson() {
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -69,5 +68,13 @@ public class StoryChapter extends Model implements JsonMappable {
 			startYear = JsonHelper.getInteger(node,"startYear");
 		if (node.has("endYear"))
 			startYear = JsonHelper.getInteger(node,"endYear");
+	}
+	
+	public static boolean owns(long userId, StoryChapter chapter) {
+		if (chapter == null)
+			return false;
+		if (userId != chapter.lifeStory.user.id)
+			return false;
+		return true;
 	}
 }

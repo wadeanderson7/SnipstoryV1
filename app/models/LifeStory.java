@@ -11,14 +11,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
-public class LifeStory extends Model implements JsonMappable {
+public class LifeStory extends JsonMappableModel {
 	
 	public static Finder<Long, LifeStory> find = new Finder<Long, LifeStory>(Long.class, LifeStory.class);
 

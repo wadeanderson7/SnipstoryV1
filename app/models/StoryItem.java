@@ -7,13 +7,12 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
-import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
-public class StoryItem extends Model implements JsonMappable {
+public class StoryItem extends JsonMappableModel {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -61,5 +60,13 @@ public class StoryItem extends Model implements JsonMappable {
 				storyPage = StoryPage.find.ref(newPage);
 			}
 		}
+	}
+
+	public static boolean owns(Long userId, StoryItem item) {
+		if (item == null)
+			return false;
+		if (userId != item.storyPage.storyChapter.lifeStory.user.id)
+			return false;
+		return true;
 	}
 }
