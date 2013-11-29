@@ -25,8 +25,8 @@ public class Users extends Controller {
 			User newUser = filledForm.get();
 			newUser.prepForCreate();
 			sendVerifyEmail(newUser);
-			Users.setUpSession(newUser);
 			newUser.save();
+			Users.setUpSession(newUser);
             return redirect(
                 routes.Application.index()
             );
@@ -51,7 +51,11 @@ public class Users extends Controller {
 	}
 	
 	public static void setUpSession(User user) {
-		if (session().get("uid") == null) {
+		setUpSession(user, false);
+	}
+	
+	public static void setUpSession(User user, boolean createUser) {
+		if (session().get("uid") == null && !createUser) {
 			user.numLogins++;
 		}
 		session().clear();
@@ -89,7 +93,6 @@ public class Users extends Controller {
 	
 	public static void sendVerifyEmail(User user) {
 		user.createResetToken(); //TODO?: use separate token from reset token?
-		user.save();
 		String url = routes.Users.verifyEmail(user.resetToken).absoluteURL(request());
 		
 		//TODO: send email
@@ -126,6 +129,25 @@ public class Users extends Controller {
 	
 	public static Result getInfo(Long id) {
 		return TODO;
+	}
+	
+	public static User getSessionUser() {
+		User user = User.find.byId(Long.parseLong(session().get("uid")));
+		return user;
+	}
+	
+	public static User getSessionUserRef() {
+		User user = User.find.ref(Long.parseLong(session().get("uid")));
+		return user;
+	}
+	
+	public static Long getSessionUid() {
+		String uid = session().get("uid");
+		if (uid != null) {
+			return Long.parseLong(uid);
+		} else {
+			return null;
+		}
 	}
 
 }

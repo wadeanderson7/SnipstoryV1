@@ -19,6 +19,17 @@ PUT     /users/:id/passwordHash	    controllers.Users.setPasswordHash(id: Long)
 PUT     /users/:id				    controllers.Users.setInfo(id: Long)
 GET     /users/:id				    controllers.Users.getInfo(id: Long)
 
+# LifeStory model
+
+GET     /mystory                    controllers.LifeStories.getMyStory()
+GET     /chapters/:id               controllers.LifeStories.getChapter(id: Long)
+GET     /pages/:id                  controllers.LifeStories.getPage(id: Long)
+GET     /items/:id                  controllers.LifeStories.getItem(id: Long)
+
+#POST    /chapters                   controllers.LifeStory.createChapter()
+#POST    /pages                      controllers.LifeStory.createChapter()
+#POST    /item
+
 # edit user info page
 GET	    /account					controllers.Application.userInfo()
 

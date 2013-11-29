@@ -14,12 +14,12 @@ public class Application extends Controller {
 
 	@Security.Authenticated(SignedIn.class)
     public static Result index() {
-		User user = User.find.byId(Long.parseLong(session().get("uid")));
+		User user = Users.getSessionUser();
         return ok(index.render(user, "You are signed in."));
     }
     
     public static Result login() {
-    	if (session().get("uid") != null)
+    	if (Users.getSessionUid() != null)
     		return redirect(routes.Application.index());
     	else
     		return ok(login.render(form(Login.class), form(User.class)));

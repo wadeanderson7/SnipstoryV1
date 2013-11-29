@@ -142,6 +142,7 @@ public class User extends Model {
 
 	public void prepForCreate() {
 		this.creation = new Date();
+		numLogins++;
 		if (salt == null)
 			createSalt();
 	}
