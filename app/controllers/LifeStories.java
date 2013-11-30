@@ -2,12 +2,13 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import models.JsonMappableModel;
+import models.JsonMappable;
 import models.LifeStory;
 import models.StoryChapter;
 import models.StoryItem;
 import models.StoryPage;
 import models.User;
+import play.db.ebean.Model;
 import play.mvc.*;
 
 @Security.Authenticated(UserSignedIn.class)
@@ -61,7 +62,8 @@ public class LifeStories extends Controller {
 		chapter.lifeStory = story;
 		
 		JsonNode node = request().body().asJson();
-		chapter.applyJson(node);
+		if (!chapter.applyJson(node))
+			return badRequest();
 		chapter.save();
 		return ok(chapter.toJson());
 	}
@@ -76,7 +78,8 @@ public class LifeStories extends Controller {
 		page.storyChapter = chapter;
 		
 		JsonNode node = request().body().asJson();
-		page.applyJson(node);
+		if (!page.applyJson(node))
+			return badRequest();
 		page.save();
 		return ok(page.toJson());
 	}
@@ -91,7 +94,8 @@ public class LifeStories extends Controller {
 		item.storyPage = page;
 		
 		JsonNode node = request().body().asJson();
-		item.applyJson(node);
+		if (!item.applyJson(node))
+			return badRequest();
 		item.save();
 		return ok(item.toJson());
 	}
@@ -101,7 +105,8 @@ public class LifeStories extends Controller {
 		StoryChapter chapter = StoryChapter.find.byId(chapterId);
 		if (!UserSignedIn.hasChapter(chapter))
 			return notFound();
-		editModel(chapter);
+		if (!editModel(chapter))
+			return badRequest();
 		return ok(chapter.toJson());
 	}
 	
@@ -109,7 +114,8 @@ public class LifeStories extends Controller {
 		StoryPage page = StoryPage.find.byId(pageId);
 		if (!UserSignedIn.hasPage(page))
 			return notFound();
-		editModel(page);
+		if (!editModel(page))
+			return badRequest();
 		return ok(page.toJson());
 	}
 	
@@ -117,14 +123,17 @@ public class LifeStories extends Controller {
 		StoryItem item = StoryItem.find.byId(itemId);
 		if (!UserSignedIn.hasItem(item))
 			return notFound();
-		editModel(item);
+		if (!editModel(item))
+			return badRequest();
 		return ok(item.toJson());
 	}
 	
-	private static void editModel(JsonMappableModel model) {
+	private static boolean editModel(JsonMappable model) {
 		JsonNode node = request().body().asJson();
-		model.applyJson(node);
-		model.save();
+		if (!model.applyJson(node))
+			return false;
+		((Model)model).save();
+		return true;
 	}
 	
 	

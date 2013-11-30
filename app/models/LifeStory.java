@@ -11,13 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
-public class LifeStory extends JsonMappableModel {
+public class LifeStory extends Model implements JsonMappable {
 	
 	public static Finder<Long, LifeStory> find = new Finder<Long, LifeStory>(Long.class, LifeStory.class);
 
@@ -45,7 +46,8 @@ public class LifeStory extends JsonMappableModel {
 	}
 
 	@Override
-	public void applyJson(JsonNode node) {
+	public boolean applyJson(JsonNode node) {
 		//no properties are writable from json
+		return true;
 	}
 }

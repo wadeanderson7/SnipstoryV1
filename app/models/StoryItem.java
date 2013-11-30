@@ -1,5 +1,7 @@
 package models;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 
 import javax.persistence.Entity;
@@ -7,12 +9,15 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
+import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import controllers.UserSignedIn;
+
 @Entity
-public class StoryItem extends JsonMappableModel {
+public class StoryItem extends Model implements JsonMappable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -44,22 +49,49 @@ public class StoryItem extends JsonMappableModel {
 	}
 
 	@Override
-	public void applyJson(JsonNode node) {
-		if (node.has("description"))
-			description = JsonHelper.getString(node,"description");
-		if (node.has("url"))
-			url = JsonHelper.getString(node,"url");
-		if (node.has("type"))
-			type = JsonHelper.getEnum(ItemType.class, node, "type");
-		if (node.has("ordering"))
-			ordering = JsonHelper.getLong(node,"ordering");
+	public boolean applyJson(JsonNode node) {
+		if (node.has("description")) {
+			String newDescription = JsonHelper.getString(node,"description");
+			if (newDescription.trim().isEmpty())
+				return false;
+			description = newDescription;
+		}
+		if (node.has("url")) {
+			String newUrl = JsonHelper.getString(node,"url");
+			try {
+				URL test = new URL(newUrl);
+				if (test.getProtocol() != "https")
+					return false;
+				if (!test.getAuthority().equals(play.Play.application().configuration().getString("snipstory.picDomain")))
+					return false;
+				//TODO: additional validation on URL for S3 pictures
+			} catch (MalformedURLException e) {
+				return false;
+			}
+			url = newUrl;
+		}
+		if (node.has("type")) {
+			ItemType newType = JsonHelper.getEnum(ItemType.class, node, "type");
+			if (type == null)
+				return false;
+			type = newType;
+		}
+		if (node.has("ordering")) {
+			Long newOrdering = JsonHelper.getLong(node,"ordering");
+			if (newOrdering == null) {
+				return false;
+			}
+			ordering = newOrdering;
+		}
 		if (node.has("page")) {
-			//TODO?: Where do we do a permissions check on the pageId (ensure new pages exists and belongs to user?)
 			long newPage = JsonHelper.getLong(node,"page");
 			if (newPage != storyPage.id) {
+				if (!UserSignedIn.hasPage(StoryPage.find.ref(newPage)))
+					return false;
 				storyPage = StoryPage.find.ref(newPage);
 			}
 		}
+		return true;
 	}
 
 	public static boolean owns(Long userId, StoryItem item) {

@@ -12,13 +12,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
-public class StoryPage extends JsonMappableModel {
+public class StoryPage extends Model implements JsonMappable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -53,12 +54,21 @@ public class StoryPage extends JsonMappableModel {
 	}
 
 	@Override
-	public void applyJson(JsonNode node) {
-		if (node.has("name"))
-			name = JsonHelper.getString(node,"name");
-		if (node.has("ordering"))
-			ordering = JsonHelper.getLong(node,"ordering");
+	public boolean applyJson(JsonNode node) {
+		if (node.has("name")) {
+			String newName = JsonHelper.getNonEmptyString(node,"name");
+			if (newName == null)
+				return false;
+			name = newName;
+		}
+		if (node.has("ordering")) {
+			Long newOrdering = JsonHelper.getLong(node,"ordering");
+			if (newOrdering == null)
+				return false;
+			ordering = newOrdering;
+		}
 		//TODO?: make chapterId editable?
+		return true;
 	}
 
 	public static boolean owns(Long userId, StoryPage page) {

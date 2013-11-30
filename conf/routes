@@ -19,16 +19,24 @@ PUT     /users/:id/passwordHash	    controllers.Users.setPasswordHash(id: Long)
 PUT     /users/:id				    controllers.Users.setInfo(id: Long)
 GET     /users/:id				    controllers.Users.getInfo(id: Long)
 
-# LifeStory model
+# LifeStory model - CRUD operations
+
+POST    /mystory/chapters           controllers.LifeStories.createChapter()
+POST    /chapters/:id/pages         controllers.LifeStories.createPage(id: Long)
+POST    /pages/:id/item             controllers.LifeStories.createItem(id: Long)
 
 GET     /mystory                    controllers.LifeStories.getMyStory()
 GET     /chapters/:id               controllers.LifeStories.getChapter(id: Long)
 GET     /pages/:id                  controllers.LifeStories.getPage(id: Long)
 GET     /items/:id                  controllers.LifeStories.getItem(id: Long)
 
-#POST    /chapters                   controllers.LifeStory.createChapter()
-#POST    /pages                      controllers.LifeStory.createChapter()
-#POST    /item
+POST    /chapters/:id               controllers.LifeStories.editChapter(id: Long)
+POST    /pages/:id                  controllers.LifeStories.editPage(id: Long)
+POST    /items/:id                  controllers.LifeStories.editItem(id: Long)
+
+DELETE  /chapters/:id               controllers.LifeStories.deleteChapter(id: Long)
+DELETE  /pages/:id                  controllers.LifeStories.deletePage(id: Long)
+DELETE  /items/:id                  controllers.LifeStories.deleteItem(id: Long)
 
 # edit user info page
 GET	    /account					controllers.Application.userInfo()

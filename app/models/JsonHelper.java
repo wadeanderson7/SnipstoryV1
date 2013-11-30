@@ -13,10 +13,24 @@ public final class JsonHelper {
 			return value.asText();
 		}
 	}
+	
+	public static String getNonEmptyString(JsonNode node, String property) {
+		//string must be non-null and non-empty (including white-space)
+		String result = getString(node, property);
+		if (result == null || result.trim().isEmpty()) {
+			return null;
+		} else {
+			return result;
+		}
+	}
 
-	public static long getLong(JsonNode node, String property) {
-		JsonNode value = node.get(property); 
-		return value.asLong();
+	public static Long getLong(JsonNode node, String property) {
+		JsonNode value = node.get(property);
+		if (value.isNull() || !value.canConvertToLong())
+			return null;
+		else {
+			return value.asLong();
+		}
 	}
 
 	public static Integer getInteger(JsonNode node, String property) {
@@ -37,7 +51,11 @@ public final class JsonHelper {
 
 	public static <T extends Enum<T>> T getEnum(Class<T> enumType, JsonNode node, String property) {
 		JsonNode value = node.get(property);
-		return T.valueOf(enumType, value.asText());
+		try {
+			return T.valueOf(enumType, value.asText());
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
 	}
 
 }

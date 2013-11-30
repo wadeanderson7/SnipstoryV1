@@ -12,13 +12,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import play.db.ebean.Model;
 import play.libs.Json;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
-public class StoryChapter extends JsonMappableModel {
+public class StoryChapter extends Model implements JsonMappable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -27,6 +28,7 @@ public class StoryChapter extends JsonMappableModel {
 	@Id
 	public long id;
 	
+	@Column(nullable = false)
 	public String name;
 	
 	
@@ -59,15 +61,32 @@ public class StoryChapter extends JsonMappableModel {
 	}
 
 	@Override
-	public void applyJson(JsonNode node) {
-		if (node.has("name"))
-			name = JsonHelper.getString(node,"name");
-		if (node.has("ordering"))
-			ordering = JsonHelper.getLong(node,"ordering");
-		if (node.has("startYear"))
-			startYear = JsonHelper.getInteger(node,"startYear");
-		if (node.has("endYear"))
-			startYear = JsonHelper.getInteger(node,"endYear");
+	public boolean applyJson(JsonNode node) {
+		if (node.has("name")) {
+			String newName = JsonHelper.getNonEmptyString(node,"name");
+			if (newName == null)
+				return false;
+			name = newName;
+		}
+		if (node.has("ordering")) {
+			Long newOrdering = JsonHelper.getLong(node,"ordering");
+			if (newOrdering == null)
+				return false;
+			ordering = newOrdering;
+		}
+		if (node.has("startYear")) {
+			Integer newYear = JsonHelper.getInteger(node,"startYear");
+			if (newYear != null && newYear < 0)
+				return false;
+			startYear = newYear;
+		}
+		if (node.has("endYear")) {
+			Integer newYear = JsonHelper.getInteger(node,"endYear");
+			if (newYear != null && newYear < 0)
+				return false;
+			endYear = newYear;
+		}
+		return true;
 	}
 	
 	public static boolean owns(long userId, StoryChapter chapter) {
