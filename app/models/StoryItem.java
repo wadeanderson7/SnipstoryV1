@@ -62,7 +62,7 @@ public class StoryItem extends Model implements JsonMappable {
 				URL test = new URL(newUrl);
 				if (test.getProtocol() != "https")
 					return false;
-				if (!test.getAuthority().equals(play.Play.application().configuration().getString("snipstory.picDomain")))
+				if (!test.getAuthority().equals(play.Play.application().configuration().getString("aws.s3.bucket")))
 					return false;
 				//TODO: additional validation on URL for S3 pictures
 			} catch (MalformedURLException e) {

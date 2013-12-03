@@ -38,6 +38,10 @@ DELETE  /chapters/:id               controllers.LifeStories.deleteChapter(id: Lo
 DELETE  /pages/:id                  controllers.LifeStories.deletePage(id: Long)
 DELETE  /items/:id                  controllers.LifeStories.deleteItem(id: Long)
 
+# Pictures upload
+POST /mystory/pictures              controllers.Pictures.uploadPicture()
+GET /mystory/pictures/:id           controllers.Pictures.getPictureInfo(id: String)
+
 # edit user info page
 GET	    /account					controllers.Application.userInfo()
 
