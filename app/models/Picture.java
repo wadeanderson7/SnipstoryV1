@@ -2,16 +2,21 @@ package models;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageInputStream;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,6 +30,7 @@ import play.libs.Json;
 import plugins.S3Plugin;
 
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -34,8 +40,6 @@ public class Picture extends Model implements JsonMappable {
 	private static final long serialVersionUID = 1L;
 	
 	public static Finder<UUID, Picture> find = new Finder<UUID, Picture>(UUID.class, Picture.class);
-
-	public static String bucket = S3Plugin.s3Bucket;
 	
 	@Id
 	public UUID id;
@@ -58,9 +62,9 @@ public class Picture extends Model implements JsonMappable {
 	}
 	
 	private String getUrlPrefix() {
-		return "https://" + bucket + "s3.amazonaws.com/";
+		return "https://" + S3Plugin.s3Bucket + ".s3.amazonaws.com/";
 	}
-		
+	
 	private String getS3Key(ThumbnailSize size) {
 		//TODO?: support non-jpeg thumbnails?
 		String extension = (size == ThumbnailSize.ORIGINAL)? type.getExtension() : ImageType.JPEG.getExtension();
@@ -125,11 +129,16 @@ public class Picture extends Model implements JsonMappable {
 				for (ThumbnailSize size : ThumbnailSize.values()) {
 					File thumbFile = generateThumbnail(size, sourceImage);
 
-					PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, getS3Key(size), file);
+					PutObjectRequest putObjectRequest = new PutObjectRequest(S3Plugin.s3Bucket, getS3Key(size), thumbFile);
+					ObjectMetadata metadata = new ObjectMetadata();
+					metadata.setContentType(size.getContentType(type));
+					metadata.setContentLength(file.length());
+					putObjectRequest.setMetadata(metadata);
 					putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 					S3Plugin.amazonS3.putObject(putObjectRequest);
-
-					thumbFile.delete();
+					
+					if (size != ThumbnailSize.ORIGINAL)
+						thumbFile.delete();
 				}
 			} catch (IOException e) {
 				Logger.error("Could not save due to exception:", e);
@@ -143,19 +152,51 @@ public class Picture extends Model implements JsonMappable {
 			return file;
 		int thumbWidth = size.getWidth(width, height);
 		int thumbHeight = size.getHeight(width, height);
+		int ratioWidth = size.getRatioWidth(width, height);
+		int ratioHeight = size.getRatioHeight(width, height);
 		
 		BufferedImage image = new BufferedImage(thumbWidth, thumbHeight, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.drawImage(sourceImage, 0, 0, thumbWidth - 1, thumbHeight - 1, 0, 0, width - 1, height - 1, Color.WHITE, null);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
+		//int drawX = (thumbWidth - ratioWidth) / 2;
+		//int drawY = (thumbHeight - ratioHeight) / 2;
+		int sourceWidth = (int)(Math.min(ratioWidth / (double)thumbWidth, thumbWidth / (double)ratioWidth)  * width);
+		int sourceHeight = (int)(Math.min(ratioHeight / (double)thumbHeight, thumbHeight / (double)ratioHeight) * height);
+		int sourceX = (width - sourceWidth) / 2;
+		int sourceY = (height - sourceHeight) / 2;
+		
+		
+		g.drawImage(sourceImage, 0, 0, thumbWidth - 1, thumbHeight - 1, sourceX, sourceY, sourceX + sourceWidth - 1, sourceY + sourceHeight - 1, Color.WHITE, null);
+		
+		//	g.drawImage(sourceImage, 0, 0, thumbWidth - 1, thumbHeight - 1, 0, 0, width - 1, height - 1, Color.WHITE, null);
+		
+				
 		//TODO?: support non-jpeg thumbnails?
 		File result = File.createTempFile("snip", null);
-		FileOutputStream out = new FileOutputStream(result);
-		ImageIO.write(image, "jpeg", out);
-		out.close();
+		
+		//up image quality from default - use 85%
+		writeJpegWithCompression(image, result, 0.85f);
+		
+		//ImageIO.write(image, "jpeg", out);
+		
 		g.dispose();
 		
 		return result;
+	}
+
+	private void writeJpegWithCompression(BufferedImage image,
+			File file, float compression) throws IOException {
+		JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+		jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		jpegParams.setCompressionQuality(compression);
+		ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+		FileImageOutputStream out = new FileImageOutputStream(file);
+		writer.setOutput(out);
+		writer.write(null, new IIOImage(image, null, null), jpegParams);
+		out.close();
 	}
 
 	@Override
@@ -166,7 +207,7 @@ public class Picture extends Model implements JsonMappable {
         }
         else {
         	for (ThumbnailSize size: ThumbnailSize.values()) {
-        		S3Plugin.amazonS3.deleteObject(bucket, getS3Key(size));
+        		S3Plugin.amazonS3.deleteObject(S3Plugin.s3Bucket, getS3Key(size));
         	}
             super.delete();
         }
@@ -197,6 +238,14 @@ public class Picture extends Model implements JsonMappable {
 	public boolean applyJson(JsonNode node) {
 		// not writable
 		return false;
+	}
+
+	public static boolean owns(Long userId, Picture pic) {
+		if (pic == null)
+			return false;
+		if (userId != pic.user.id)
+			return false;
+		return true;
 	}
 	
 }

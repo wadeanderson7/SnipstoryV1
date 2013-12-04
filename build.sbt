@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   cache,
   "mysql" % "mysql-connector-java" % "5.1.25",
   "com.typesafe" %% "play-plugins-mailer" % "2.1.0",
-  "com.amazonaws" % "aws-java-sdk" % "1.3.11"
+  "com.amazonaws" % "aws-java-sdk" % "1.6.7"
 )
 
 play.Project.playJavaSettings

@@ -1,5 +1,6 @@
 package controllers;
 
+import models.Picture;
 import models.StoryChapter;
 import models.StoryItem;
 import models.StoryPage;
@@ -28,5 +29,9 @@ public class UserSignedIn extends Authenticator {
 	
 	public static boolean hasItem(StoryItem item) {
 		return StoryItem.owns(Users.getSessionUid(), item);
+	}
+	
+	public static boolean hasPicture(Picture pic) {
+		return Picture.owns(Users.getSessionUid(), pic);
 	}
 }

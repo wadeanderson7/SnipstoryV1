@@ -33,11 +33,13 @@ public class Pictures extends Controller {
 			badRequest();
 		}
 		
-		File file = picture.getFile();
+		File file = picture.getFile();	
 		Picture pic = new Picture();
 		pic.file = file;
 		pic.user = Users.getSessionUserRef();
 		pic.save();
+		pic.file = null;
+		file.delete();
 		
 		//return json array representing picture locations
 		return ok(pic.toJson());
@@ -52,4 +54,21 @@ public class Pictures extends Controller {
 	}
 	
 	//TODO?: how/when do we delete pictures?
+	public static Result deletePicture(String uuid) {
+		Picture pic = Picture.find.byId(UUID.fromString(uuid));
+		if (pic.user != Users.getSessionUserRef()) {
+			return notFound();
+		}
+		pic.delete();
+		return ok();
+	}
+	
+	public static Result deleteAll() {
+		for (Picture pic : Picture.find.all()) {
+			try {
+				pic.delete();
+			} catch (Exception e) {}
+		}
+		return ok();
+	}
 }

@@ -5,11 +5,17 @@ import com.avaje.ebean.annotation.EnumValue;
 public enum ImageType {
 
 	@EnumValue("jpeg")
-	JPEG,
+	JPEG("image/jpeg"),
 	@EnumValue("png")
-	PNG,
+	PNG("image/png"),
 	@EnumValue("gif")
-	GIF;
+	GIF("image/gif");
+	
+	private String contentType;
+
+	private ImageType(String contentType) {
+		this.contentType = contentType;
+	}
 	
 	public static ImageType getFromContentType(String contentType) {
 		switch(contentType) {
@@ -35,5 +41,9 @@ public enum ImageType {
 	
 	public String getExtension() {
 		return toString().toLowerCase();
+	}
+
+	public String getContentType() {
+		return contentType;
 	}
 }

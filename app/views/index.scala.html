@@ -1,10 +1,21 @@
 @(user: User, message: String)
 
-@main("Welcome to Play") {
+@scripts = {
+	<script src="@routes.Assets.at("javascripts/picHandling.js")" type="text/javascript"></script>
+}
+
+@main("Welcome to Play", scripts) {
 
 	<div><em>@message</em></div>
 	<div>Signed in as: @user.name (@user.email)</div>
 	<div><a href="@routes.Application.logout()">Sign out</a></div>
+	<h2>Saved pictures</h2>
+	
+	<h2>Add picture</h2>
+	<h3 id="error"></h3>
+	<form>
+		Select a picture (jpeg/png/gif): <input type="file" name="picFile" />
+	</form>
 	<div>TODO: rest of page</div>
     @* @play20.welcome(message, style = "Java") *@
 

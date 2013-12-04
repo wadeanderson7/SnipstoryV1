@@ -1,17 +1,19 @@
 package models;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
+import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import play.db.ebean.Model;
 import play.libs.Json;
 
+import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.UserSignedIn;
@@ -26,7 +28,10 @@ public class StoryItem extends Model implements JsonMappable {
 	@Id
 	public long id;
 	
-	public String url;
+	@OneToOne(cascade = CascadeType.ALL)
+	@PrivateOwned
+	public Picture picture;
+	
 	public ItemType type;
 	
 	@Lob
@@ -41,7 +46,7 @@ public class StoryItem extends Model implements JsonMappable {
 	public JsonNode toJson() {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("description", description);
-		map.put("url", url);
+		map.put("picture", picture.toJson());
 		map.put("type", type);
 		map.put("ordering", ordering);
 		map.put("page", storyPage.id);
@@ -56,19 +61,23 @@ public class StoryItem extends Model implements JsonMappable {
 				return false;
 			description = newDescription;
 		}
-		if (node.has("url")) {
-			String newUrl = JsonHelper.getString(node,"url");
-			try {
-				URL test = new URL(newUrl);
-				if (test.getProtocol() != "https")
+		if (node.has("picture")) {
+			JsonNode pictureNode = node.get("picture");
+			if (pictureNode.isNull()) {
+				picture = null;
+			} else {
+				if (!node.has("uuid"))
 					return false;
-				if (!test.getAuthority().equals(play.Play.application().configuration().getString("aws.s3.bucket")))
+				try {
+					UUID uuid = UUID.fromString(node.get("uuid").asText());
+					Picture pic = Picture.find.byId(uuid);
+					if (!UserSignedIn.hasPicture(pic))
+						return false;
+					picture = pic;
+				} catch (IllegalArgumentException e) {
 					return false;
-				//TODO: additional validation on URL for S3 pictures
-			} catch (MalformedURLException e) {
-				return false;
+				}
 			}
-			url = newUrl;
 		}
 		if (node.has("type")) {
 			ItemType newType = JsonHelper.getEnum(ItemType.class, node, "type");
