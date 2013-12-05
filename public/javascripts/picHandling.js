@@ -14,11 +14,10 @@ $(document).ready(function() {
 	canvas = document.createElement('canvas');
 	context = canvas.getContext('2d');
 	canvas.width = 1500;
-	
 	$("input[name='picFile']").change(function(evt) {
 		var files = evt.target.files;
 		if (files.length > 0) {
-			var f = files[0]
+			var f = files[0];
 			//handle first image only
 			
 			if (!f.type.match('image.*')) {
@@ -41,12 +40,16 @@ function loadImage(file) {
 	var img = new Image();
 	img.src = file;
 	img.onload = function() {
-		saveImageThumbnail(this, file.length);
+		saveImageThumbnail(this, file);
 	};
 }
 
-function saveImageThumbnail(image, origDataUrlLength) {
-	var blob = createThumbnailBlob(image, origDataUrlLength);
+function saveImageThumbnail(image, file) {
+	var blob = createThumbnailBlob(image, file.length);
+	if (blob == null) {
+		//original is smaller in size, use that
+		blob = dataURItoBlob(file);
+	}
 	//ajax upload
 	var formData = new FormData();
 	formData.append("picture", blob);
@@ -71,6 +74,9 @@ function createThumbnailBlob(image, origDataUrlLength, maxDim, forceSquare) {
 	maxDim = (typeof maxDim === "undefined") ? 1500 : maxDim;
 	forceSquare = (typeof forceSquare === "undefined") ? false : forceSquare;
 	origDataUrlLength = (typeof origDataUrlLength === "undefined") ? 0 : origDataUrlLength;
+	
+	if (image.width < maxDim && image.height < maxDim)
+		return null;
 	
 	var ratioWidth, ratioHeight;
 	var thumbWidth, thumbHeight;

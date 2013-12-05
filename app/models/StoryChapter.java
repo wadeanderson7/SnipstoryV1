@@ -47,16 +47,30 @@ public class StoryChapter extends Model implements JsonMappable {
 	
 	@Override
 	public JsonNode toJson() {
+		return toJson(false);
+	}
+	
+	@Override
+	public JsonNode toJson(boolean showChildren) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("id", id);
 		map.put("name", name);
 		map.put("startYear", JsonHelper.getValueOrNull(startYear));
 		map.put("endYear", JsonHelper.getValueOrNull(endYear));
 		map.put("ordering", ordering);
 		map.put("story", lifeStory.id);
-		ArrayList<Long> pageList = new ArrayList<Long>();
-		for (StoryPage p : pages)
-			pageList.add(p.id);
-		map.put("pages", pageList);
+		
+		if (showChildren) {
+			ArrayList<JsonNode> pageList = new ArrayList<JsonNode>();
+			for (StoryPage p : pages)
+				pageList.add(p.toJson(true));
+			map.put("pages", pageList);
+		} else {
+			ArrayList<Long> pageList = new ArrayList<Long>();
+			for (StoryPage p : pages)
+				pageList.add(p.id);
+			map.put("pages", pageList);
+		}
 		return Json.toJson(map);
 	}
 

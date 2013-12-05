@@ -20,12 +20,12 @@ PUT     /users/:id				    controllers.Users.setInfo(id: Long)
 GET     /users/:id				    controllers.Users.getInfo(id: Long)
 
 # LifeStory model - CRUD operations
-
 POST    /mystory/chapters           controllers.LifeStories.createChapter()
 POST    /chapters/:id/pages         controllers.LifeStories.createPage(id: Long)
 POST    /pages/:id/item             controllers.LifeStories.createItem(id: Long)
 
-GET     /mystory                    controllers.LifeStories.getMyStory()
+GET     /mystory                    controllers.LifeStories.getMyStory
+GET     /mystory/all                controllers.LifeStories.getAllMyStory
 GET     /chapters/:id               controllers.LifeStories.getChapter(id: Long)
 GET     /pages/:id                  controllers.LifeStories.getPage(id: Long)
 GET     /items/:id                  controllers.LifeStories.getItem(id: Long)
@@ -43,11 +43,15 @@ POST     /pictures/deleteAll         controllers.Pictures.deleteAll()
 
 # Pictures upload
 POST    /mystory/pictures           controllers.Pictures.uploadPicture()
+GET     /mystory/pictures           controllers.Pictures.getAllUserPictures()
 GET     /mystory/pictures/:id       controllers.Pictures.getPictureInfo(id: String)
 DELETE  /mystory/pictures/:id       controllers.Pictures.deletePicture(id: String)
 
 # edit user info page
 GET	    /account					controllers.Application.userInfo()
+
+# javascript routing info
+GET     /assets/javascripts/routes  controllers.Application.javascriptRoutes()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -1,0 +1,29 @@
+<nav>
+<h2>Chapters</h2>
+<ul>
+  <li ng-repeat="chapter in story.chapters | orderBy:ordering" ng-class="{selected: curChapter.id==chapter.id}">{{chapter.name}}</li>
+</ul>
+<a href="javascript:void(0);">Table of Contents</a>
+<button>Add Snippet</button>
+</nav>
+
+<aside>
+<h2>Pages</h2>
+<ul>
+  <li ng-repeat="page in curChapter.pages">{{page.name}}</li>
+</ul>
+</aside>
+
+<h2>Page view</h2>
+<article class="pageView">
+  <section ng-repeat="page in curChapter.pages">
+    <header>
+      <h3>{{page.name}}</h3>
+      <p>{{page.description}}</p>
+    </header>
+    <div class="snippet" ng-repeat="item in page.items">
+      <img ng-if="item.picture" ng-src="{{getPicUrl(item.picture,'flow')}}" />
+      <p>{{item.description}}</p>
+    </div>
+  </section>
+</article>

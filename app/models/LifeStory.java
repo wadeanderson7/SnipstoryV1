@@ -36,12 +36,25 @@ public class LifeStory extends Model implements JsonMappable {
 
 	@Override
 	public JsonNode toJson() {
+		return toJson(false);
+	}
+
+	@Override
+	public JsonNode toJson(boolean showChildren) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("id", id);
 		map.put("user", user.id);
-		ArrayList<Long> chapterList = new ArrayList<Long>();
-		for (StoryChapter c : chapters)
-			chapterList.add(c.id);
-		map.put("chapters", chapterList);
+		if (showChildren) {
+			ArrayList<JsonNode> chapterList = new ArrayList<JsonNode>();
+			for (StoryChapter c : chapters)
+				chapterList.add(c.toJson(true));
+			map.put("chapters", chapterList);
+		} else {
+			ArrayList<Long> chapterList = new ArrayList<Long>();
+			for (StoryChapter c : chapters)
+				chapterList.add(c.id);
+			map.put("chapters", chapterList);
+		}
 		return Json.toJson(map);
 	}
 
@@ -49,5 +62,5 @@ public class LifeStory extends Model implements JsonMappable {
 	public boolean applyJson(JsonNode node) {
 		//no properties are writable from json
 		return true;
-	}
+	}	
 }

@@ -1,0 +1,15 @@
+@(user: User)
+
+<header>
+ <h1>SnipStory</h1>
+ <nav>
+  <ul class="mainNav">
+   <li><a href="@routes.Application.index()">Editor</a></li>
+  </ul>
+  <span>@user.name (@user.email)</span>
+  <ul class="userNav">
+   <li><a href="#" ng-click="">Profile</a></li>
+   <li><a href="@routes.Application.logout()">Logout</a></li>
+  </ul>
+ </nav>
+</header>

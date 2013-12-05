@@ -15,6 +15,7 @@ import play.libs.Json;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 import controllers.UserSignedIn;
 
@@ -44,9 +45,14 @@ public class StoryItem extends Model implements JsonMappable {
 	
 	@Override
 	public JsonNode toJson() {
+		return toJson(false);
+	}
+	
+	@Override
+	public JsonNode toJson(boolean showChildren) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("description", description);
-		map.put("picture", picture.toJson());
+		map.put("picture", (picture != null)? picture.toJson() : NullNode.getInstance());
 		map.put("type", type);
 		map.put("ordering", ordering);
 		map.put("page", storyPage.id);

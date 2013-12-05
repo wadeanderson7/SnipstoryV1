@@ -62,6 +62,30 @@ public class Application extends Controller {
 		}
     }
     
+    public static Result javascriptRoutes() {
+    	response().setContentType("text/javascript");
+    	return ok(
+    		Routes.javascriptRouter("jsRoutes", 
+				controllers.routes.javascript.LifeStories.createChapter(),
+				controllers.routes.javascript.LifeStories.createPage(),
+				controllers.routes.javascript.LifeStories.createItem(),
+				controllers.routes.javascript.LifeStories.getChapter(),
+				controllers.routes.javascript.LifeStories.getPage(),
+				controllers.routes.javascript.LifeStories.getItem(),
+				controllers.routes.javascript.LifeStories.editChapter(),
+				controllers.routes.javascript.LifeStories.editPage(),
+				controllers.routes.javascript.LifeStories.editItem(),
+				controllers.routes.javascript.LifeStories.deleteChapter(),
+				controllers.routes.javascript.LifeStories.deletePage(),
+				controllers.routes.javascript.LifeStories.deleteItem(),
+				controllers.routes.javascript.LifeStories.getMyStory(),
+				controllers.routes.javascript.LifeStories.getAllMyStory(),
+				controllers.routes.javascript.Pictures.getPictureInfo(),
+				controllers.routes.javascript.Pictures.uploadPicture()
+    		)	
+    	);
+    }
+    
     public static Result userInfo() {
     	return TODO;
     }

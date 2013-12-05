@@ -29,6 +29,7 @@ public class StoryPage extends Model implements JsonMappable {
 	public long id;
 	
 	public String name;
+	public String description;
 	
 	@Column(nullable = false)
 	public long ordering;
@@ -42,14 +43,28 @@ public class StoryPage extends Model implements JsonMappable {
 	
 	@Override
 	public JsonNode toJson() {
+		return toJson(false);
+	}
+	
+	@Override
+	public JsonNode toJson(boolean showChildren) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("id", id);
 		map.put("name", name);
+		map.put("description", description);
 		map.put("ordering", ordering);
 		map.put("chapter", storyChapter.id);
-		ArrayList<Long> itemList = new ArrayList<Long>();
-		for (StoryItem i : items)
-			itemList.add(i.id);
-		map.put("items", itemList);
+		if (showChildren) {
+			ArrayList<JsonNode> itemList = new ArrayList<JsonNode>();
+			for (StoryItem i : items)
+				itemList.add(i.toJson(true));
+			map.put("items", itemList);
+		} else {
+			ArrayList<Long> itemList = new ArrayList<Long>();
+			for (StoryItem i : items)
+				itemList.add(i.id);
+			map.put("items", itemList);
+		}
 		return Json.toJson(map);
 	}
 
@@ -60,6 +75,12 @@ public class StoryPage extends Model implements JsonMappable {
 			if (newName == null)
 				return false;
 			name = newName;
+		}
+		if (node.has("description")) {
+			String newDesc = JsonHelper.getNonEmptyString(node,"description");
+			if (newDesc == null)
+				return false;
+			description = newDesc;
 		}
 		if (node.has("ordering")) {
 			Long newOrdering = JsonHelper.getLong(node,"ordering");

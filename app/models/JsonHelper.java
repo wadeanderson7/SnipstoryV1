@@ -1,5 +1,8 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 
@@ -56,6 +59,14 @@ public final class JsonHelper {
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
+	}
+	
+	public static List<JsonNode> listToJsonList(List<? extends JsonMappable> list) {
+		List<JsonNode> result = new ArrayList<JsonNode>(list.size()); 
+		for(JsonMappable item : list) {
+			result.add(item.toJson());
+		}
+		return result;
 	}
 
 }

@@ -50,7 +50,7 @@ public class Picture extends Model implements JsonMappable {
 	public int width;
 	@Column(nullable = false)
 	public int height;
-		
+	
 	@OneToOne
 	public User user;
 	
@@ -172,8 +172,7 @@ public class Picture extends Model implements JsonMappable {
 		g.drawImage(sourceImage, 0, 0, thumbWidth - 1, thumbHeight - 1, sourceX, sourceY, sourceX + sourceWidth - 1, sourceY + sourceHeight - 1, Color.WHITE, null);
 		
 		//	g.drawImage(sourceImage, 0, 0, thumbWidth - 1, thumbHeight - 1, 0, 0, width - 1, height - 1, Color.WHITE, null);
-		
-				
+						
 		//TODO?: support non-jpeg thumbnails?
 		File result = File.createTempFile("snip", null);
 		
@@ -212,13 +211,18 @@ public class Picture extends Model implements JsonMappable {
             super.delete();
         }
 	}
-
+	
 	@Override
 	public JsonNode toJson() {
+		return toJson(false);
+	}
+
+	@Override
+	public JsonNode toJson(boolean showChildren) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("width", width);
 		map.put("height", height);
-		map.put("uuid", id);
+		map.put("id", id);
 		map.put("url", getUrl());
 		HashMap<String,Object> thumbsMap = new HashMap<String, Object>();
 		for (ThumbnailSize size : ThumbnailSize.values()) {
@@ -227,7 +231,7 @@ public class Picture extends Model implements JsonMappable {
 			HashMap<String,Object> thumbMap = new HashMap<String, Object>();
 			thumbMap.put("width", size.getWidth(width, height));
 			thumbMap.put("height", size.getHeight(width, height));
-			thumbMap.put("url", getUrl(size));
+			//thumbMap.put("url", getUrl(size));
 			thumbsMap.put(size.toString().toLowerCase(), thumbMap);
 		}
 		map.put("thumbnails", thumbsMap);

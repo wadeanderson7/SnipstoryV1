@@ -19,6 +19,11 @@ public class LifeStories extends Controller {
 		return ok(story.toJson());
 	}
 	
+	public static Result getAllMyStory() {
+		LifeStory story = getUserStory();
+		return ok(story.toJson(true));
+	}
+	
 	private static LifeStory getUserStory() {
 		LifeStory story = LifeStory.find.where().eq("user_id", request().username()).findUnique();
 		if (story == null) {

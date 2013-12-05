@@ -1,10 +1,14 @@
 package controllers;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import models.ImageType;
+import models.JsonHelper;
 import models.Picture;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Security;
 import play.mvc.Http.MultipartFormData;
@@ -51,6 +55,13 @@ public class Pictures extends Controller {
 			return notFound();
 		}
 		return ok(pic.toJson());
+	}
+	
+	public static Result getAllUserPictures() {
+		List<Picture> pics = Picture.find.where().eq("user_id", Users.getSessionUid()).findList();
+		HashMap<String,Object> map = new HashMap<String, Object>();
+		map.put("pictures", JsonHelper.listToJsonList(pics));
+		return ok(Json.toJson(map));
 	}
 	
 	//TODO?: how/when do we delete pictures?
