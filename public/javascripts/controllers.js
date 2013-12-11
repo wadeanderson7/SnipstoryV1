@@ -7,6 +7,13 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
 	  $scope.curChapter = data.chapters[0];
 	  $scope.pageIdx = 0; //TODO: update with scroll
 	});
+	
+	window.onbeforeunload =  function() {
+		if (imageHandler.syncInProgress())
+			return "Syncing is not complete. Leaving the page now will cause errors.";
+		else
+			return null;
+	};
 	 
     $scope.orderProp = 'age';
     $scope.numUploading = imageHandler.numUploading;
@@ -26,11 +33,70 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     	return imageHandler.pics[imageId.toString()][thumbType];
     };
     
+    $scope.deleteItem = function deleteItem(itemId, itemIdx) {
+    	var deleteConfirmModal = $modal.open({
+    		templateUrl: 'confirmDeleteSnippet.html',
+    		controller: 'ConfirmDeleteSnippetCtrl',
+    	});
+    	var pageIdx = $scope.pageIdx;
+    	deleteConfirmModal.result.then(function() {
+        	imageHandler.incUploads();
+    		$scope.curChapter.pages[pageIdx].items.splice(itemIdx, 1);
+    		$http.delete('/items/' + itemId)
+			.success(function(data, status, headers, config) {
+				imageHandler.decUploads();
+			}).error(function(data, status, headers, config) {
+				//TODO: add error handler of some sort
+			});
+    	});
+    };
+    
+    $scope.editItem = function editItem(itemId, itemIdx) {
+    	var pageIdx = $scope.pageIdx;
+    	var item = $scope.curChapter.pages[pageIdx].items[itemIdx];
+    	var editConfirmModal = $modal.open({
+    		templateUrl: 'editSnippetDialog.html',
+    		controller: 'EditSnippetCtrl',
+    		resolve: {
+    	        thumbnail: function () {
+    	          if (item.localImageId)
+    	        	  return $scope.getLocalPic(item.localImageId, 'medium');
+    	          else if (item.picture)
+    	        	  return $scope.getPicUrl(item.picture, 'medium');
+    	          else
+    	        	  return null;
+    	        },
+    	        caption: function() { return item.description; }
+    	      },
+    	      backdrop: 'static'
+    	});
+    	editConfirmModal.result.then(function(result) {
+        	imageHandler.incUploads();
+        	item.description = result.caption;
+        	if (result.picId) {
+        		item.localImageId = result.picId;
+        		item.picture = null;
+        		
+        		if (!imageHandler.assignWaitingPicToItem(item.id)) {
+    				imageHandler.addItemWaitingForPic(result.picId, item.id);
+    			}
+        	}
+    		var data = {"description":result.caption};
+    		$http.post('/items/' + itemId, data)
+			.success(function(data, status, headers, config) {
+				imageHandler.decUploads();
+			}).error(function(data, status, headers, config) {
+				//TODO: add error handler of some sort
+			});
+    	}); 	
+    }
+    
     $scope.showAddSnippetDialog = function() {
     	
     	var addSnippetModal = $modal.open({
     		templateUrl: 'addSnippetDialog.html',
     		controller: 'AddSnippetDialogCtrl',
+    		backdrop: 'static'
     	});
     	
     	addSnippetModal.result.then(function (result) {   		
@@ -64,9 +130,7 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
 
 snipStoryControllers.controller('AddSnippetDialogCtrl', ['$scope', '$modalInstance', 'imageHandler',
 	function($scope, $modalInstance, imageHandler) {
-	
-	$scope.okToAdd = false;
-	$scope.hasSelectedPic = false;
+
 	$scope.thumbnail = null;
 	$scope.picId = null;
 	$scope.caption = null;
@@ -91,3 +155,42 @@ snipStoryControllers.controller('AddSnippetDialogCtrl', ['$scope', '$modalInstan
 		$modalInstance.dismiss('cancel');
 	};
 }]);
+
+snipStoryControllers.controller('EditSnippetCtrl', ['$scope', '$modalInstance', 'imageHandler', 'thumbnail', 'caption',
+ 	function($scope, $modalInstance, imageHandler, thumbnail, caption) {
+
+ 	$scope.thumbnail = thumbnail;
+ 	$scope.picId = null;
+ 	$scope.caption = caption;
+ 	
+ 	$scope.selectPic = function() {
+ 		$("#picChangeFileInput").click();
+ 	};
+ 	
+ 	$scope.uploadPic = function uploadPic(picFile) {
+ 		var picId = imageHandler.doThumbnailAndUpload(picFile, function() {
+ 			$scope.thumbnail = imageHandler.pics[picId.toString()].original;
+ 			$scope.$apply();
+ 		});
+ 		$scope.picId = picId;
+ 	};
+ 	
+ 	$scope.ok = function() {
+ 		$modalInstance.close({picId:$scope.picId, caption:$scope.caption});
+ 	};
+ 	$scope.cancel = function() {
+ 		//TODO: if picture is uploaded, delete it - if it is queued for upload, queue if for deletion
+ 		$modalInstance.dismiss('cancel');
+ 	};
+ }]);
+
+snipStoryControllers.controller('ConfirmDeleteSnippetCtrl', ['$scope', '$modalInstance',
+ 	function($scope, $modalInstance, imageHandler) {
+ 	
+ 	$scope.ok = function() {
+ 		$modalInstance.close();
+ 	};
+ 	$scope.cancel = function() {
+ 		$modalInstance.dismiss('cancel');
+ 	};
+ }]);

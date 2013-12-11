@@ -13,7 +13,6 @@ import javax.persistence.OneToOne;
 import play.db.ebean.Model;
 import play.libs.Json;
 
-import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 
@@ -30,7 +29,6 @@ public class StoryItem extends Model implements JsonMappable {
 	public long id;
 	
 	@OneToOne(cascade = CascadeType.ALL)
-	@PrivateOwned
 	public Picture picture;
 	
 	public ItemType type;
@@ -106,6 +104,17 @@ public class StoryItem extends Model implements JsonMappable {
 			}
 		}
 		return true;
+	}
+	
+	@Override
+	public void delete() {
+		//TODO: only using this until can figure out how to get Ebean to cascade the delete correctly
+		Picture pic = picture;
+		picture = null;
+		super.save();
+		super.delete();
+		if (pic != null)
+			pic.delete();
 	}
 
 	public static boolean owns(Long userId, StoryItem item) {

@@ -6,8 +6,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.IIOImage;
@@ -28,8 +30,10 @@ import play.Logger;
 import play.db.ebean.Model;
 import play.libs.Json;
 import plugins.S3Plugin;
+import scala.Array;
 
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -205,9 +209,13 @@ public class Picture extends Model implements JsonMappable {
             throw new RuntimeException("Could not delete");
         }
         else {
+        	List<String> keys = new ArrayList<String>(ThumbnailSize.values().length); 
         	for (ThumbnailSize size: ThumbnailSize.values()) {
-        		S3Plugin.amazonS3.deleteObject(S3Plugin.s3Bucket, getS3Key(size));
+        		keys.add(getS3Key(size));
         	}
+        	DeleteObjectsRequest request = new DeleteObjectsRequest(S3Plugin.s3Bucket);
+    		request.withKeys(keys.toArray(new String[0]));
+    		S3Plugin.amazonS3.deleteObjects(request);
             super.delete();
         }
 	}

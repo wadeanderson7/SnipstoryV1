@@ -22,6 +22,8 @@
       <p>{{page.description}}</p>
     </header>
     <div class="snippet" ng-repeat="item in page.items">
+      <div><a href="javascript:void(0);" ng-click="editItem(item.id, $index)">Edit</a>
+      <a href="javascript:void(0);" ng-click="deleteItem(item.id, $index)">Delete</a></div>
       <img ng-if="item.picture" ng-src="{{getPicUrl(item.picture,'flow')}}" />
       <img ng-if="item.localImageId" ng-src="{{getLocalPic(item.localImageId,'flow')}}" />
       <p>{{item.description}}</p>
@@ -36,7 +38,9 @@
     <div class="modal-body">
     	<div ng-show="!thumbnail">
     		<button class="btn" ng-click="selectPic()">Select Picture</button>
-    		<input type="file" id="picFileInput" ng-show="false" onchange="angular.element(this).scope().uploadPic(this.files[0]); angular.element(this).scope().$digest();" />
+    		<input type="file" id="picFileInput" ng-show="false" 
+    			onchange="angular.element(this).scope().uploadPic(this.files[0]); angular.element(this).scope().$digest();"
+    			accept="image/jpeg|image/png|image/gif" />
     	</div>
     	<div ng-show="thumbnail">
     		<img ng-src="{{thumbnail}}">
@@ -45,7 +49,34 @@
     	</div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
         <button class="btn btn-primary" ng-click="ok()" ng-show="thumbnail">OK</button>
+    </div>
+</script>
+<script type="text/ng-template" id="editSnippetDialog.html">
+    <div class="modal-header">
+        <h3>Edit Snippet</h3>
+    </div>
+    <div class="modal-body">
+		<div><img ng-src="{{thumbnail}}"></div>
+		<button class="btn" ng-click="selectPic()">Change Picture</button>
+		<input type="file" id="picChangeFileInput" ng-show="false" 
+			onchange="angular.element(this).scope().uploadPic(this.files[0]); angular.element(this).scope().$digest();"
+			accept="image/jpeg|image/png|image/gif" />
+		<p>Edit caption:</p>
+        <textarea ng-model="$parent.caption"></textarea>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-click="ok()" ng-show="thumbnail">Save</button>
+    </div>
+</script>
+<script type="text/ng-template" id="confirmDeleteSnippet.html">
+    <div class="modal-body">
+    	<p>Are you sure you want to delete this snippet?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">No</button>
+        <button class="btn btn-primary" ng-click="ok()">Yes</button>
     </div>
 </script>

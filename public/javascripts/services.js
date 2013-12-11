@@ -19,6 +19,9 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 		function decUploads() {
 			numUploading.value--;
 		};
+		function syncInProgress() {
+			return numUploading.value > 0;
+		}
 		function getNextId() {
 			return nextId++;
 		}
@@ -26,8 +29,11 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 		return {
 			pics : pics,
 			assignWaitingPicToItem : assignWaitingPicToItem,
+			syncInProgress : syncInProgress,
 			numUploading : function() { return numUploading.value; },
-			addItemWaitingForPic : function addItemWaitingForPic(picId, itemId) { itemsWaitingForUuids[picId] = itemId; }, 
+			addItemWaitingForPic : function addItemWaitingForPic(picId, itemId) { itemsWaitingForUuids[picId] = itemId; },
+			incUploads : incUploads,
+			decUploads : decUploads,
 			doThumbnailAndUpload : function(file, callback, uploadDoneCallback) {
 				if (!file.type.match('image.*')) {
 			        return null;
