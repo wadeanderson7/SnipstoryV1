@@ -17,12 +17,33 @@ public class Application extends Controller {
 		User user = Users.getSessionUser();
         return ok(index.render(user, ""));
     }
+	
+	public static Result landing() {
+		if (Users.getSessionUid() != null)
+    		return redirect(routes.Application.index());
+    	else
+    		return ok(landing.render());
+	}
+	
+	public static Result about() {
+		if (Users.getSessionUid() != null)
+    		return redirect(routes.Application.index());
+    	else
+    		return ok(about.render());
+	}
     
     public static Result login() {
     	if (Users.getSessionUid() != null)
     		return redirect(routes.Application.index());
     	else
-    		return ok(login.render(form(Login.class), form(User.class)));
+    		return ok(login.render(form(Login.class)));
+    }
+    
+    public static Result register() {
+    	if (Users.getSessionUid() != null)
+    		return redirect(routes.Application.index());
+    	else
+    		return ok(register.render(form(User.class)));
     }
     
     public static Result logout() {
@@ -36,7 +57,7 @@ public class Application extends Controller {
     public static Result authenticate() {
     	Form<Login> loginForm = form(Login.class).bindFromRequest();
         if (loginForm.hasErrors()) {
-            return badRequest(login.render(loginForm, form(User.class)));
+            return badRequest(login.render(loginForm));
         } else {
             User user = User.find.where().eq("email", loginForm.get().email).findUnique();
             Users.setUpSession(user);

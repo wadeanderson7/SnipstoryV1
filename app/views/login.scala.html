@@ -1,37 +1,8 @@
-@(loginForm: Form[Application.Login], registerForm: Form[User])
+@(loginForm: Form[Application.Login])
 
 @scripts = {
 	<script src="@routes.Assets.at("javascripts/sha256.js")" type="text/javascript"></script>
-	<script src="@routes.Assets.at("javascripts/commonPasswords.js")" type="text/javascript"></script>
 	<script type="text/javascript">
-		function registerCheck(form) {
-			//confirm passwords
-			var pwdElem = $(form).find("input[name='password']");
-			var pwd = pwdElem.val();
-			
-			$(form).find(".inputError").text("");
-			
-			if (pwd.length < 8) {
-				pwdElem.parent().find(".inputError").text("Too short (need 8 or more characters)");
-				return false;
-			}
-			
-			if (isCommonPassword(pwd)) {
-				pwdElem.parent().find(".inputError").text("Password is too common, choose another");
-				return false;
-			}
-			
-			var confirmPwdElem = $(form).find("input[name='confirmPassword']");
-			
-			if (confirmPwdElem.length && pwdElem.val() != confirmPwdElem.val()) {
-				confirmPwdElem.parent().find(".inputError").text("Passwords don't match");
-				return false;
-			}
-			
-			setUpPwdHash(pwdElem, confirmPwdElem, $(form).find("input[name='passwordHash']"));
-			return true;
-		};
-		
 		function loginCheck(form) {
 			var pwdElem = $(form).find("input[name='password']");
 			setUpPwdHash(pwdElem, {}, $(form).find("input[name='passwordHash']"));
@@ -49,38 +20,7 @@
 
 @main("SnipStory", scripts) {
 
-    @helper.form(routes.Users.create, 'onsubmit -> "return registerCheck(this)") {
-	   <h1>Register</h1>
-		@if(registerForm.hasGlobalErrors) {
-		    <p class="error">
-		        @registerForm.globalError.message
-		    </p>
-		}
-	   <p>
-	       <input type="text" name="name" placeholder="name" value="@registerForm("name").value">
-	   </p>
-	   <p>
-	       <input type="text" name="birthdate" placeholder="birthdate (mm/dd/yyyy)" value="@registerForm("birthdate").value">
-	       <span class="inputError"></span>
-	   </p>
-	   <p>
-	       <input type="email" name="email" placeholder="email" value="@registerForm("email").value">
-	       <span class="inputError"></span>
-	   </p>
-	   <p>
-	       <input type="password" name="password" placeholder="password">
-	       <span class="inputError"></span>
-	   </p>
-	   <p>
-	       <input type="password" name="confirmPassword" placeholder="confirm password">
-	       <span class="inputError"></span>
-	   </p>
-	   <p>
-	   	   <input type="hidden" name="passwordHash">
-	       <button type="submit">Create Account</button>
-	   </p>
-	}
-	
+	@staticnavbar()
 	@helper.form(routes.Application.authenticate, 'onsubmit -> "return loginCheck(this)") {
 	   <h1>Sign In</h1>
 		@if(loginForm.hasGlobalErrors) {

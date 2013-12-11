@@ -20,7 +20,7 @@ public class Users extends Controller {
 	public static Result create() {
 		Form<User> filledForm = newUserForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.login.render(form(Login.class), filledForm));
+			return badRequest(views.html.register.render(filledForm));
 		} else {
 			User newUser = filledForm.get();
 			newUser.prepForCreate();
