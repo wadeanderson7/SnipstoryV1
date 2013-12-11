@@ -87,7 +87,7 @@ public class StoryItem extends Model implements JsonMappable {
 		}
 		if (node.has("type")) {
 			ItemType newType = JsonHelper.getEnum(ItemType.class, node, "type");
-			if (type == null)
+			if (newType == null)
 				return false;
 			type = newType;
 		}

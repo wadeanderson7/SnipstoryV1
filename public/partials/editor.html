@@ -2,15 +2,14 @@
 <h2>Chapters</h2>
 <ul>
   <li ng-repeat="chapter in story.chapters | orderBy:ordering" ng-class="{selected: curChapter.id==chapter.id}">{{chapter.name}}</li>
-</ul>
 <a href="javascript:void(0);">Table of Contents</a>
-<button>Add Snippet</button>
+<button class="btn btn-primary" ng-click="showAddSnippetDialog()">Add Snippet</button>
 </nav>
 
 <aside>
 <h2>Pages</h2>
 <ul>
-  <li ng-repeat="page in curChapter.pages">{{page.name}}</li>
+  <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">{{page.name}}</li>
 </ul>
 </aside>
 
@@ -27,3 +26,24 @@
     </div>
   </section>
 </article>
+
+<script type="text/ng-template" id="addSnippetDialog.html">
+    <div class="modal-header">
+        <h3>Add a Snippet</h3>
+    </div>
+    <div class="modal-body">
+    	<div ng-show="!thumbnail">
+    		<button class="btn" ng-click="selectPic()">Select Picture</button>
+    		<input type="file" id="picFileInput" ng-show="false" onchange="angular.element(this).scope().uploadPic(this.files[0]); angular.element(this).scope().$digest();" />
+    	</div>
+    	<div ng-show="thumbnail">
+    		<img ng-src="{{thumbnail}}">
+    		<p>Add a caption:</p>
+	        <textarea ng-model="$parent.caption"></textarea>
+    	</div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-click="ok()" ng-show="thumbnail">OK</button>
+    </div>
+</script>

@@ -11,3 +11,7 @@
 	margin-top: 30px;
 	padding: 15px;
 }
+
+.selected {
+	font-weight:bold;
+}

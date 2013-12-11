@@ -38,7 +38,7 @@ public class Users extends Controller {
 		User user = User.find.where().eq("reset_token", resetToken).findUnique();
 		if (form.hasErrors()) {
 			return badRequest(views.html.resetPassword.render(user, form));
-		} else if (user == null) {
+		} else if (user == null || user.isResetTokenExpired()) {
 			flash("message", "Reset link has expired, please try again");
 			return redirect(routes.Application.accountRecover());
 		} else {
