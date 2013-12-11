@@ -1,16 +1,21 @@
 <nav>
 <h2>Chapters</h2>
 <ul>
-  <li ng-repeat="chapter in story.chapters | orderBy:ordering" ng-class="{selected: curChapter.id==chapter.id}">{{chapter.name}}</li>
+  <li ng-repeat="chapter in story.chapters | orderBy:ordering" ng-class="{selected: curChapter.id==chapter.id}">
+    <a href="javascript:void(0);" ng-click="setChapter($index)">{{chapter.name}}</a>
+  </li>
 <a href="javascript:void(0);">Table of Contents</a>
-<button class="btn btn-primary" ng-click="showAddSnippetDialog()">Add Snippet</button>
+<button class="btn btn-primary" ng-click="addItem()">Add Snippet</button>
 <p ng-if="numUploading()">Uploading... ({{numUploading()}})</p>
 </nav>
 
 <aside>
 <h2>Pages</h2>
 <ul>
-  <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">{{page.name}}</li>
+  <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">
+    <a href="javascript:void(0);" ng-click="setPageIdx($index)">{{page.name}}</a>
+  </li>
+  <li><button class="btn" ng-click="addPage()">Add a page...</button></li>
 </ul>
 </aside>
 
@@ -50,7 +55,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-primary" ng-click="ok()" ng-show="thumbnail">OK</button>
+        <button class="btn btn-primary" ng-click="ok()" ng-show="thumbnail">Add</button>
     </div>
 </script>
 <script type="text/ng-template" id="editSnippetDialog.html">
@@ -78,5 +83,20 @@
     <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">No</button>
         <button class="btn btn-primary" ng-click="ok()">Yes</button>
+    </div>
+</script>
+<script type="text/ng-template" id="addPageDialog.html">
+    <div class="modal-header">
+        <h3>Create Page</h3>
+    </div>
+    <div class="modal-body">
+    	<label>Name of page: </label>
+    	<input type="text" ng-model="$parent.name" placeholder="e.g. name of event or topic" />
+    	<p>Description</p>
+        <textarea ng-model="$parent.description"></textarea>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-click="ok()" ng-show="name">Add</button>
     </div>
 </script>

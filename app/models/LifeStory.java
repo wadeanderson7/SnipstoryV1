@@ -24,6 +24,8 @@ public class LifeStory extends Model implements JsonMappable {
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final long ORDERING_INTERVAL = 1000000;
+	
 	@Id
 	public long id;
 	

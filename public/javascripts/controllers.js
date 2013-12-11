@@ -14,9 +14,19 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
 		else
 			return null;
 	};
+	
+	var ORDER_INTERVAL = 1000000;
 	 
     $scope.orderProp = 'age';
     $scope.numUploading = imageHandler.numUploading;
+    
+    $scope.setChapter = function setChapter(idx) {
+    	$scope.curChapter = $scope.story.chapters[idx];
+    };
+    
+    $scope.setPageIdx = function setPageIdx(idx) {
+    	$scope.pageIdx = idx;
+    };
     
     $scope.getPicUrl = function getPicUrl(picture, thumbType) {
     	var url = picture.url;
@@ -91,8 +101,7 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     	}); 	
     }
     
-    $scope.showAddSnippetDialog = function() {
-    	
+    $scope.addItem = function() {
     	var addSnippetModal = $modal.open({
     		templateUrl: 'addSnippetDialog.html',
     		controller: 'AddSnippetDialogCtrl',
@@ -101,7 +110,6 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     	
     	addSnippetModal.result.then(function (result) {   		
     		//create item
-    		var ORDER_INTERVAL = 1000000;
     		var pageIdx = $scope.pageIdx;
     		var page = $scope.curChapter.pages[pageIdx];
     		var items = page.items;
@@ -124,6 +132,34 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     		
     	});
     	
+    };
+    
+    $scope.addPage = function() {
+    	var addPageModal = $modal.open({
+    		templateUrl: 'addPageDialog.html',
+    		controller: 'AddPageDialogCtrl',
+    		backdrop: 'static'
+    	});
+    	
+    	addPageModal.result.then(function (result) {   		
+    		//create page
+    		var chapter = $scope.curChapter;
+    		var pages = chapter.pages;
+    		var ordering = ORDER_INTERVAL;
+    		if (pages.length > 0)
+    			ordering += pages[pages.length - 1].ordering;
+    		var newPage = {"description":result.description, "name":result.name, "ordering":ordering};
+    		imageHandler.incUploads();
+    		$http.post('/chapters/' + chapter.id + '/pages', newPage, {})
+			.success(function(data, status, headers, config) {
+				$scope.curChapter.pages.push(data);
+				imageHandler.decUploads();
+				$scope.pageIdx = pages.length - 1;
+			}).error(function(data, status, headers, config) {
+				//TODO: add error handler of some sort
+			});
+    		
+    	});
     };
     
 }]);
@@ -185,12 +221,27 @@ snipStoryControllers.controller('EditSnippetCtrl', ['$scope', '$modalInstance', 
  }]);
 
 snipStoryControllers.controller('ConfirmDeleteSnippetCtrl', ['$scope', '$modalInstance',
- 	function($scope, $modalInstance, imageHandler) {
+ 	function($scope, $modalInstance) {
  	
  	$scope.ok = function() {
  		$modalInstance.close();
  	};
  	$scope.cancel = function() {
+ 		$modalInstance.dismiss('cancel');
+ 	};
+ }]);
+
+snipStoryControllers.controller('AddPageDialogCtrl', ['$scope', '$modalInstance',
+ 	function($scope, $modalInstance) {
+
+ 	$scope.description = null;
+ 	$scope.name = null;
+ 	 	
+ 	$scope.ok = function() {
+ 		$modalInstance.close({description:$scope.description, name:$scope.name});
+ 	};
+ 	$scope.cancel = function() {
+ 		//TODO: if picture is uploaded, delete it - if it is queued for upload, queue if for deletion
  		$modalInstance.dismiss('cancel');
  	};
  }]);

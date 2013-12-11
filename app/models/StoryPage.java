@@ -78,8 +78,6 @@ public class StoryPage extends Model implements JsonMappable {
 		}
 		if (node.has("description")) {
 			String newDesc = JsonHelper.getNonEmptyString(node,"description");
-			if (newDesc == null)
-				return false;
 			description = newDesc;
 		}
 		if (node.has("ordering")) {

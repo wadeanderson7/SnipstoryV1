@@ -43,7 +43,7 @@ public class StoryChapter extends Model implements JsonMappable {
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@PrivateOwned
-	List<StoryPage> pages;
+	public List<StoryPage> pages;
 	
 	@Override
 	public JsonNode toJson() {

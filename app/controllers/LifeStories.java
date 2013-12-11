@@ -27,10 +27,71 @@ public class LifeStories extends Controller {
 	private static LifeStory getUserStory() {
 		LifeStory story = LifeStory.find.where().eq("user_id", request().username()).findUnique();
 		if (story == null) {
-			//create story for the user
+			//create initial story for the user
 			User user = Users.getSessionUserRef();
 			story = new LifeStory();
 			story.user = user;
+			
+			StoryChapter chapter = new StoryChapter();
+			chapter.lifeStory = story;
+			chapter.name = "Childhood";
+			chapter.ordering = LifeStory.ORDERING_INTERVAL;
+			StoryPage page = new StoryPage();
+			page.storyChapter = chapter;
+			page.description = "Add a description for this page.";
+			page.name = "Page 1";
+			page.ordering = LifeStory.ORDERING_INTERVAL;
+			chapter.pages.add(page);
+			story.chapters.add(chapter);
+			
+			chapter = new StoryChapter();
+			chapter.lifeStory = story;
+			chapter.name = "School";
+			chapter.ordering = LifeStory.ORDERING_INTERVAL * 2;
+			page = new StoryPage();
+			page.storyChapter = chapter;
+			page.description = "Add a description for this page.";
+			page.name = "Page 1";
+			page.ordering = LifeStory.ORDERING_INTERVAL;
+			chapter.pages.add(page);
+			story.chapters.add(chapter);
+			
+			chapter = new StoryChapter();
+			chapter.lifeStory = story;
+			chapter.name = "College";
+			chapter.ordering = LifeStory.ORDERING_INTERVAL * 3;
+			page = new StoryPage();
+			page.storyChapter = chapter;
+			page.description = "Add a description for this page.";
+			page.name = "Page 1";
+			page.ordering = LifeStory.ORDERING_INTERVAL;
+			chapter.pages.add(page);
+			story.chapters.add(chapter);
+			
+			chapter = new StoryChapter();
+			chapter.lifeStory = story;
+			chapter.name = "Wedding";
+			chapter.ordering = LifeStory.ORDERING_INTERVAL * 4;
+			page = new StoryPage();
+			page.storyChapter = chapter;
+			page.description = "Add a description for this page.";
+			page.name = "Page 1";
+			page.ordering = LifeStory.ORDERING_INTERVAL;
+			chapter.pages.add(page);
+			story.chapters.add(chapter);
+			
+			chapter = new StoryChapter();
+			chapter.lifeStory = story;
+			chapter.name = "Employment";
+			chapter.ordering = LifeStory.ORDERING_INTERVAL * 5;
+			page = new StoryPage();
+			page.storyChapter = chapter;
+			page.description = "Add a description for this page.";
+			page.name = "Page 1";
+			page.ordering = LifeStory.ORDERING_INTERVAL;
+			chapter.pages.add(page);
+			story.chapters.add(chapter);
+			
 			story.save();
 		}
 		return story;
