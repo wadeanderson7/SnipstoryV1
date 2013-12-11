@@ -51,6 +51,7 @@ public class StoryItem extends Model implements JsonMappable {
 	@Override
 	public JsonNode toJson(boolean showChildren) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("id", id);
 		map.put("description", description);
 		map.put("picture", (picture != null)? picture.toJson() : NullNode.getInstance());
 		map.put("type", type);
@@ -72,10 +73,8 @@ public class StoryItem extends Model implements JsonMappable {
 			if (pictureNode.isNull()) {
 				picture = null;
 			} else {
-				if (!node.has("uuid"))
-					return false;
 				try {
-					UUID uuid = UUID.fromString(node.get("uuid").asText());
+					UUID uuid = UUID.fromString(pictureNode.textValue());
 					Picture pic = Picture.find.byId(uuid);
 					if (!UserSignedIn.hasPicture(pic))
 						return false;

@@ -9,11 +9,21 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
 	});
 	 
     $scope.orderProp = 'age';
+    $scope.numUploading = imageHandler.numUploading;
     
     $scope.getPicUrl = function getPicUrl(picture, thumbType) {
     	var url = picture.url;
     	var index = url.indexOf(picture.id) + picture.id.length + 1;
-    	return url.substring(0,index) + "thumb_" + thumbType + "." + url.substring(index, url.length);
+    	if (thumbType == "original")
+    		return url;
+    	else {
+    		//return url.substring(0,index) + "thumb_" + thumbType + "." + url.substring(index, url.length);
+    		return url.substring(0,index) + "thumb_" + thumbType + ".jpeg"; //all thumbnails are jpegs for now
+    	}
+    };
+    
+    $scope.getLocalPic = function getLocalPic(imageId, thumbType) {
+    	return imageHandler.pics[imageId.toString()][thumbType];
     };
     
     $scope.showAddSnippetDialog = function() {
@@ -35,8 +45,12 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     		var newItem = {"description":result.caption, "type":"IMAGE", "ordering":ordering};
     		$http.post('/pages/' + page.id + '/item', newItem, {})
 			.success(function(data, status, headers, config) {
+				data.localImageId = result.picId;
 				$scope.curChapter.pages[pageIdx].items.push(data);
-				//TODO: modify item with image once it is generated
+				//add waiting image to item or add item to list of items waiting for pics to upload
+				if (!imageHandler.assignWaitingPicToItem(data.id)) {
+					imageHandler.addItemWaitingForPic(result.picId, data.id);
+				}
 				
 			}).error(function(data, status, headers, config) {
 				//TODO: add error handler of some sort

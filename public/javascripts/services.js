@@ -7,15 +7,17 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 		canvas.width = 1500;
 		
 		var remotePictures = {};
+		var uuidWaitingForItem = {value:null};
+		var itemsWaitingForUuids = {}; 
 		var pics = {};
-		var nextId = 0;
-		var numUploading = 0;
+		var nextId = 1;
+		var numUploading = {value:0};
 		
 		function incUploads() {
-			numUploading++;
+			numUploading.value++;
 		};
 		function decUploads() {
-			numUploading--;
+			numUploading.value--;
 		};
 		function getNextId() {
 			return nextId++;
@@ -23,7 +25,10 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 		
 		return {
 			pics : pics,
-			doThumbnailAndUpload : function(file, callback) {
+			assignWaitingPicToItem : assignWaitingPicToItem,
+			numUploading : function() { return numUploading.value; },
+			addItemWaitingForPic : function addItemWaitingForPic(picId, itemId) { itemsWaitingForUuids[picId] = itemId; }, 
+			doThumbnailAndUpload : function(file, callback, uploadDoneCallback) {
 				if (!file.type.match('image.*')) {
 			        return null;
 			    }
@@ -32,57 +37,62 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 				var id = getNextId();
 				pics[id.toString()] = {original: null, flow: null};
 			    reader.onload = function(e) {
-		    		loadImage(e.target.result, id, callback);
+		    		loadImage(e.target.result, id, callback, uploadDoneCallback);
 		    	};
 		    	reader.readAsDataURL(file);
 		    	return id;
 			}
 		};
 		
-		function loadImage(file, id, callback) {
+		function loadImage(file, id, callback, uploadDoneCallback) {
 			incUploads();
 			var img = new Image();
 			img.src = file;
 			img.onload = function() {
-				var dataUrl = saveImageThumbnail(this, file, id, callback);
+				var dataUrl = saveImageThumbnail(this, file, id, callback, uploadDoneCallback);
 				
 			};
 		}
 		
-		function saveImageThumbnail(image, file, id, callback) {
+		function saveImageThumbnail(image, file, id, callback, uploadDoneCallback) {
 			var dataUrl = createThumbnail(image, file.length);
 			var blob;
-			if (blob == null) {
+			if (dataUrl == null) {
 				//original is smaller in size, use that
-				//convert to binary
-				blob = dataURItoBlob(file);
-			} else {
 				dataUrl = file;
-				//convert to binary
-				blob = dataURItoBlob(dataUrl);
 			}
+			//convert to binary
+			blob = dataURItoBlob(dataUrl);
+			//create flow thumbnail
+			var dataUrlFlow = createThumbnail(image, file.length, 300, true);
 			
 			pics[id.toString()].original = dataUrl;
+			pics[id.toString()].flow = dataUrlFlow;
 			callback();
 			
 			//ajax upload
 			var formData = new FormData();
 			formData.append("picture", blob);
 			
-			//TODO: have some kind of status for when this is running
-			/*
 			$http.post('/mystory/pictures', formData, {
 				  headers: { 'Content-Type': undefined },
 				  transformRequest: function(data) { return data; }
 				})
 			.success(function(data, status, headers, config) {
 				remotePictures[data.id] = data;
-				alert("Image " + id + " saved as " + data.id);
+				if (itemsWaitingForUuids[id]) {
+					assignPicToItem(data.id, id, itemsWaitingForUuids[id]);
+					delete itemsWaitingForUuids[id];
+				} else {
+					//TODO: handle case for cancelled upload					
+					uuidWaitingForItem.value = data.id;
+				}
+				
+				if (uploadDoneCallback) uploadDoneCallback();
 				decUploads();
 			}).error(function(data, status, headers, config) {
 				//TODO: add error handler of some sort
 			});
-			*/
 			
 			//TODO: create flow thumbnail as well
 			
@@ -112,12 +122,14 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 			
 			var ratioWidth, ratioHeight;
 			var thumbWidth, thumbHeight;
+			
 			if (image.width >= image.height) {
-				ratioWidth = maxDim;
-				ratioHeight = Math.round(maxDim * (image.height / image.width));
+				ratioWidth = (forceSquare)? Math.floor(image.width * (maxDim/image.height)) : maxDim;
+				ratioHeight = (forceSquare)? maxDim : Math.floor(maxDim * (image.height/image.width));
 			} else {
-				ratioHeight = maxDim;
-				ratioWidth = Math.round(maxDim * (image.width / image.height));
+				ratioWidth = (forceSquare)? maxDim : Math.floor(maxDim * (image.width/image.height));
+				ratioHeight = (forceSquare)? Math.floor(image.height * (maxDim/image.width)) : maxDim;
+				
 			}
 			if (forceSquare) {
 				thumbWidth = maxDim;
@@ -130,12 +142,19 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 			canvas.width = thumbWidth;
 			canvas.height = thumbHeight;
 			
-			var drawX = Math.round((thumbWidth - ratioWidth) / 2.0);
-			var drawY = Math.round((thumbHeight - ratioHeight) / 2.0);
+			var sourceWidth = Math.floor(Math.min(ratioWidth / thumbWidth, thumbWidth / ratioWidth)  * image.width);
+			var sourceHeight = Math.floor(Math.min(ratioHeight / thumbHeight, thumbHeight / ratioHeight) * image.height);
+			var sourceX = (image.width - sourceWidth) / 2;
+			var sourceY = (image.height - sourceHeight) / 2;
+			
+//			var drawX = Math.round((thumbWidth - ratioWidth) / 2.0);
+//			var drawY = Math.round((thumbHeight - ratioHeight) / 2.0);
 			
 			context.fillStyle = 'white';
 			context.fillRect ( 0, 0, thumbWidth, thumbHeight);
-			context.drawImage(image, drawX, drawY, thumbWidth, thumbHeight);
+			context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, thumbWidth, thumbHeight);
+			
+			//context.drawImage(image, drawX, drawY, thumbWidth, thumbHeight);
 			var compressionLevel = 1.0;
 			var compressionInterval = 0.1;
 			var dataUrl;
@@ -166,5 +185,33 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 		    // write the ArrayBuffer to a blob, and you're done
 		    var blob = new Blob([ab], {type:mimeString});
 		    return blob;
+		}
+		
+		function assignPicToItem(picUuid, picLocalId, itemId) {
+			var data = {"picture":picUuid};
+			incUploads();//TODO: move increment to when item is added to waiting list?
+			$http.post('/items/' + itemId, data)
+			.success(function(data, status, headers, config) {
+				decUploads();
+			}).error(function(data, status, headers, config) {
+				
+			});
+		}
+		
+		function assignWaitingPicToItem(itemId) {
+			if (uuidWaitingForItem.value) {
+				var data = {"picture":uuidWaitingForItem.value};
+				uuidWaitingForItem.value = null;
+				incUploads(); //TODO: move increment to when uuidWaitingForItem.value is assigned?  
+				$http.post('/items/' + itemId, data)
+				.success(function(data, status, headers, config) {
+					decUploads();
+				}).error(function(data, status, headers, config) {
+					
+				});
+				return true;
+			} else {
+				return false;
+			}
 		}
 }]);

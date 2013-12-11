@@ -4,6 +4,7 @@
   <li ng-repeat="chapter in story.chapters | orderBy:ordering" ng-class="{selected: curChapter.id==chapter.id}">{{chapter.name}}</li>
 <a href="javascript:void(0);">Table of Contents</a>
 <button class="btn btn-primary" ng-click="showAddSnippetDialog()">Add Snippet</button>
+<p ng-if="numUploading()">Uploading... ({{numUploading()}})</p>
 </nav>
 
 <aside>
@@ -22,6 +23,7 @@
     </header>
     <div class="snippet" ng-repeat="item in page.items">
       <img ng-if="item.picture" ng-src="{{getPicUrl(item.picture,'flow')}}" />
+      <img ng-if="item.localImageId" ng-src="{{getLocalPic(item.localImageId,'flow')}}" />
       <p>{{item.description}}</p>
     </div>
   </section>
