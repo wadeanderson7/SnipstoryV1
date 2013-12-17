@@ -1,6 +1,8 @@
-<p ng-if="numUploading()">Uploading... ({{numUploading()}})</p>
-<a href="#/editor"ng-click="saveChapter()">&larr; Back to story</a>
-<h2>Table of Contents</h2>
+<nav class="chapter-nav">
+<a href="#/editor"ng-click="saveChapter()" class="btn">&larr; Back to story</a>
+<span class="pull-right" ng-if="numUploading()">Uploading... ({{numUploading()}})</span>
+<span class="navHeader">Table of Contents</span>
+</nav>
 <h2>Chapters</h2>
 <ul>
   <li ng-repeat="chapter in story.chapters" ng-class="{selected: chapter.id==curChapter.id}">

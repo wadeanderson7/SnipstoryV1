@@ -3,6 +3,11 @@
 	display: inline-block;
 	padding: 15px;
 	margin: 15px;
+	vertical-align: middle;
+}
+
+.snippet p {
+	width: 263px;
 }
 
 .pageView header {
@@ -46,6 +51,14 @@
 	border-bottom: 1px solid #222222;
 }
 
+.navHeader {
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.7em;
+	display: inline-block;
+	width: 80%;
+}
+
 .view-body {
 	padding-top: 100px;
 }
@@ -56,13 +69,54 @@ aside {
 }
 
 .pageView {
-	padding-left: 10px;
+	padding-left: 0px;
 	padding-right: 10px;
 	width: 977px;
 	float: right;
 }
 
+.modal textarea {
+	width: 100%
+}
+
 .brand {
 	margin-left: 0px !important;
 	30 + 263 + 60 + 263 + 60 + 263 + 30 
+}
+
+.pagesList ul {
+	list-style-type: none;
+	margin-left: 10px;
+}
+
+.pagesList {
+	width: 251px;
+}
+
+.pagesList li {
+	border: 1px solid black;
+	text-align: center;
+	border-radius: 4px;
+	font-size: 1.5em;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.pagesList .selected {
+	font-weight: normal;
+	background-color: #eeeeff;
+}
+
+.pagesList li div div {
+	font-size: 0.6em;
+	text-align: right;
+	position: relative;
+	padding-right: 5px;
+	line-height: 1.2em;
+	left: 195px;
+	top: -15px;
+}
+
+.pageActions {
+	position: absolute;
 }

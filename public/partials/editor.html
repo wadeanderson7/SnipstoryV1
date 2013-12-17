@@ -4,16 +4,16 @@
      ng-click="setChapter($index)">{{chapter.name}}</button>
 </div>
 <a href="#/toc">Table of Contents</a>
-<button class="btn btn-primary" ng-click="addItem()">Add Snippet</button>
+<button class="btn btn-primary pull-right" ng-click="addItem()">Add Snippet</button>
 <span class="pull-right" ng-if="numUploading()">Uploading... ({{numUploading()}})</span>
 </nav>
 
-<aside>
+<aside class="pagesList">
 <ul>
   <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">
+  <div class="pageActions"><div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a></div>
+      <div><a ng-if="curChapter.pages.length > 1" href="javascript:void(0);" ng-click="deletePage(page.id, $index)">Delete</a></div></div>
     <a href="javascript:void(0);" ng-click="setPageIdx($index)">{{page.name}}</a>
-    <div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a>
-      <a ng-if="curChapter.pages.length > 1" href="javascript:void(0);" ng-click="deletePage(page.id, $index)">Delete</a></div>
   </li>
   <li><button class="btn" ng-click="addPage()">Add a page...</button></li>
 </ul>
