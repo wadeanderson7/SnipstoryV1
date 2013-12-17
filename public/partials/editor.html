@@ -5,11 +5,10 @@
 </div>
 <a href="#/toc">Table of Contents</a>
 <button class="btn btn-primary" ng-click="addItem()">Add Snippet</button>
-<p ng-if="numUploading()">Uploading... ({{numUploading()}})</p>
+<span class="pull-right" ng-if="numUploading()">Uploading... ({{numUploading()}})</span>
 </nav>
 
 <aside>
-<h2>Pages</h2>
 <ul>
   <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">
     <a href="javascript:void(0);" ng-click="setPageIdx($index)">{{page.name}}</a>
@@ -20,7 +19,6 @@
 </ul>
 </aside>
 
-<h2>Page view</h2>
 <article class="pageView">
   <section ng-repeat="page in curChapter.pages">
     <header>
@@ -32,7 +30,7 @@
       <a href="javascript:void(0);" ng-click="deleteItem($parent.$index, $index, item.id)">Delete</a></div>
       <img ng-if="item.picture" ng-src="{{getPicUrl(item.picture,'flow')}}" />
       <img ng-if="item.localImageId" ng-src="{{getLocalPic(item.localImageId,'flow')}}" />
-      <p>{{item.description}}</p>
+      <p>{{item.description || '&nbsp;'}}</p>
     </div>
   </section>
 </article>
