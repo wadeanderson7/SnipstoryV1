@@ -1,4 +1,4 @@
-<nav>
+<nav class="chapter-nav">
 <div class="btn-group">
   <button ng-repeat="chapter in story.chapters | orderBy:ordering" class="btn" ng-class="{'btn-primary': curChapter.id==chapter.id}"
      ng-click="setChapter($index)">{{chapter.name}}</button>

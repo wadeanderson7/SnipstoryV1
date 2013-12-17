@@ -1,6 +1,6 @@
 var snipStoryApp = angular.module('snipStoryApp', [
 	'ngRoute',
-	'snipStoryControllers'
+	'snipStoryControllers',
 ]);
 
 snipStoryApp.config(['$routeProvider',

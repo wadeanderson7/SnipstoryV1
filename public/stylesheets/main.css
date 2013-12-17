@@ -8,14 +8,48 @@
 .pageView header {
 	border:1px solid #222222;
 	border-radius: 10px;
-	margin-top: 30px;
+	margin-top: -1px;
+	margin-left: -1px;
+	margin-right: -1px;
 	padding: 15px;
+	offset
+}
+
+.pageView header h3 {
+	display: inline-block;
+}
+
+.pageView header p {
+	display: inline-block;
+	margin-left: 40px;
+}
+
+.pageView section {
+	border: 1px solid #222222;
+	border-radius: 10px;
+	margin-bottom: 30px
 }
 
 .selected {
 	font-weight:bold;
 }
 
+.chapter-nav {
+	position: fixed;
+	right: 0;
+	left: 0;
+	z-index: 1030;
+	margin-bottom: 0;
+	padding:10px;
+	background: white;
+	top: 40px;
+}
+
+.view-body {
+	padding-top: 80px;
+}
+
 .pageView {
-	position:fixed;max-height:100%;overflow-y:auto;
+	padding-left: 10px;
+	padding-right: 10px;
 }
