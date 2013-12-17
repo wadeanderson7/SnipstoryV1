@@ -10,6 +10,10 @@ snipStoryApp.config(['$routeProvider',
 				templateUrl: 'assets/partials/editor.html',
 				controller: 'EditorCtrl',
 			}).
+			when('/toc',  {
+				templateUrl: 'assets/partials/toc.html',
+				controller: 'TocCtrl',
+			}).
 			otherwise({
 				redirectTo: '/editor'
 			});

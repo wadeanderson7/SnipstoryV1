@@ -1,24 +1,29 @@
 var snipStoryControllers = angular.module('snipStoryControllers', ['ui.bootstrap', 'snipStoryServices']);
 
-snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'imageHandler',
-  function ($scope, $http, $modal, imageHandler) {
-	$http.get('/mystory/all').success(function(data) {
-	  $scope.story = data;
-	  $scope.curChapter = data.chapters[0];
-	  $scope.pageIdx = 0; //TODO: update with scroll
+snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'imageHandler','storyService',
+  function ($scope, $http, $modal, imageHandler, storyService) {
+	storyService.getStory(function(story) {
+		$scope.story = story;
+		$scope.curChapter = story.chapters[0];
+		$scope.pageIdx = 0; //TODO: update with scroll
 	});
 	
-	window.onbeforeunload =  function() {
+	/*$http.get('/mystory/all').success(function(data) {
+	  $scope.story = data;
+	  $scope.curChapter = data.chapters[0];
+	  $scope.pageIdx = 0;
+	}); //TODO?: move querying/holding story into service?*/
+	
+	$(window).unload(function() {
 		if (imageHandler.syncInProgress())
 			return "Syncing is not complete. Leaving the page now will cause errors.";
 		else
 			return null;
-	};
+	});
 	
-	var ORDER_INTERVAL = 1000000;
-	 
-    $scope.orderProp = 'age';
-    $scope.numUploading = imageHandler.numUploading;
+	var ORDER_INTERVAL = 1000000; //TODO: move into service
+
+	$scope.numUploading = imageHandler.numUploading; //TODO: move to external controller
     
     $scope.setChapter = function setChapter(idx) {
     	$scope.curChapter.lastPageIdx = $scope.pageIdx; 
@@ -317,4 +322,146 @@ snipStoryControllers.controller('EditPageDialogCtrl', ['$scope', '$modalInstance
    	$scope.cancel = function() {
    		$modalInstance.dismiss('cancel');
    	};
+}]);
+
+//--------------- Table of Contents ------------------
+
+snipStoryControllers.controller('TocCtrl', ['$scope', '$http', '$modal', 'imageHandler','storyService',
+   function ($scope, $http, $modal, imageHandler, storyService) {
+	storyService.getStory(function(story) {
+		$scope.story = story;
+		//$scope.curChapter = story.chapters[0];
+		setChapter(0);
+	});
+	
+	
+ 	/*$http.get('/mystory/all').success(function(data) {
+ 	  $scope.story = data;
+ 	  $scope.curChapter = data.chapters[0];
+ 	  $scope.setChapter(0);
+ 	}); //TODO?: move querying/holding story into service?*/
+ 	
+ 	//TODO: upload after certain time when chapter is dirty to help prevent lost changes
+	var dirty = {value:false};
+	
+    $scope.numUploading = imageHandler.numUploading; //TODO: move to external controller
+    
+    $scope.dirty = function() {
+    	dirty.value = true; 
+    };
+    
+    function setChapter(idx) {
+    	var chapter = $scope.story.chapters[idx];
+    	$scope.curChapter = chapter;
+    }
+ 	
+ 	$scope.setChapter = function setChapter(idx) {
+    	var chapter = $scope.story.chapters[idx];
+    	$scope.curChapter = chapter;
+    };
+    
+    $scope.addChapter = function () {
+    	var chapters = $scope.story.chapters;
+    	imageHandler.incUploads();
+    	var newChapter = {"name":"Chapter " + chapters.length};
+    	$http.post('/mystory/chapters', newChapter)
+		.success(function(data, status, headers, config) {
+			imageHandler.decUploads();
+			chapters.push(data);
+			$scope.setChapter(chapters.length - 1);
+		}).error(function(data, status, headers, config) {
+			//TODO: add error handler of some sort
+		});
+    };
+    
+    $scope.saveChapter = function() {
+    	var c = $scope.curChapter;
+    	imageHandler.incUploads();
+    	var changes = {"name":c.name, "description":c.description, startYear:c.startYear, endYear:c.endYear};
+    	$http.post('/chapters/' + c.id, changes)
+		.success(function(data, status, headers, config) {
+			imageHandler.decUploads();
+		}).error(function(data, status, headers, config) {
+			//TODO: add error handler of some sort
+		});
+    };
+    
+    $scope.deleteChapter = function deleteChapter(chapterId, chapterIdx) {
+		var chapters = $scope.story.chapters;
+    	
+    	if (chapters.length == 1)
+    		return; //can't delete last chapter
+    	
+    	var deleteConfirmModal = $modal.open({
+    		templateUrl: 'confirmDeleteChapter.html',
+    		controller: 'ConfirmCtrl',
+    	});
+    	deleteConfirmModal.result.then(function() {
+        	imageHandler.incUploads();
+        	
+        	if ($scope.curChapter.id == chapterId) {
+        		if (chapterIdx == chapters.length-1)
+        			$scope.curChapter = chapters[chapterIdx-1];
+        		else
+        			$scope.curChapter = chapters[chapterIdx+1];
+        	} 
+    		chapters.splice(chapterIdx, 1);
+    		
+    		$http.delete('/chapters/' + chapterId)
+			.success(function(data, status, headers, config) {
+				imageHandler.decUploads();
+			}).error(function(data, status, headers, config) {
+				//TODO: add error handler of some sort
+			});
+    	});
+    };
+    
+    $scope.editPage = function editPage(pageId, pageIdx) {
+    	var page = $scope.curChapter.pages[pageIdx];
+    	var editModal = $modal.open({
+    		templateUrl: 'editPageDialog.html',
+    		controller: 'EditPageDialogCtrl',
+    		resolve: {
+    	        name: function() { return page.name; },
+    	        description: function() { return page.description; }
+    	      },
+    	      backdrop: 'static'
+    	});
+    	editModal.result.then(function(result) {
+        	imageHandler.incUploads();
+        	page.name = result.name;
+        	page.description = result.description;
+    		var data = {"name":result.name, "description":result.description};
+    		$http.post('/pages/' + pageId, data)
+			.success(function(data, status, headers, config) {
+				imageHandler.decUploads();
+			}).error(function(data, status, headers, config) {
+				//TODO: add error handler of some sort
+			});
+    	}); 	
+    };
+    
+    $scope.deletePage = function deletePage(pageId, pageIdx) {
+    	var pages = $scope.curChapter.pages;
+    	
+    	if (pages.length == 1)
+    		return; //can't delete last page
+    	
+    	var deleteConfirmModal = $modal.open({
+    		templateUrl: 'confirmDeletePage.html',
+    		controller: 'ConfirmCtrl',
+    	});
+    	deleteConfirmModal.result.then(function() {
+        	imageHandler.incUploads();
+    		pages.splice(pageIdx, 1);
+    		
+    		$http.delete('/pages/' + pageId)
+			.success(function(data, status, headers, config) {
+				imageHandler.decUploads();
+			}).error(function(data, status, headers, config) {
+				//TODO: add error handler of some sort
+			});
+    	});
+    };
+                                             	
 }]);

@@ -61,9 +61,7 @@ public class StoryItem extends Model implements JsonMappable {
 	@Override
 	public boolean applyJson(JsonNode node) {
 		if (node.has("description")) {
-			String newDescription = JsonHelper.getString(node,"description");
-			if (newDescription.trim().isEmpty())
-				return false;
+			String newDescription = JsonHelper.getNonEmptyString(node,"description");
 			description = newDescription;
 		}
 		if (node.has("picture")) {

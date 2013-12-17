@@ -1,7 +1,7 @@
 package models;
 
 public enum ThumbnailSize {
-	SMALL(150), FLOW(300, true), MEDIUM(500), LARGE(1000), ORIGINAL(-1);
+	SMALL(150), FLOW(263, true), MEDIUM(500), LARGE(1000), ORIGINAL(-1);
 	
 	private int maxDim;
 	private boolean forceSquare;

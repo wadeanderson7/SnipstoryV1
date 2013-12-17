@@ -1,5 +1,24 @@
 var snipStoryServices = angular.module('snipStoryServices', []);
 
+snipStoryServices.factory('storyService', ['$http',
+    function ($http) {
+	
+	var story = null;
+	
+	return {
+		getStory : function getStory(callback) {
+			if (story == null) {
+				$http.get('/mystory/all').success(function(data) {
+					  story = data;
+					  callback(story);
+					});
+			} else {
+				callback(story);
+			}
+		}
+	};
+}]);
+
 snipStoryServices.factory('imageHandler', ['$http', '$document',
     function ($http, $document) {
 		var canvas = document.createElement('canvas');
@@ -70,7 +89,8 @@ snipStoryServices.factory('imageHandler', ['$http', '$document',
 			//convert to binary
 			blob = dataURItoBlob(dataUrl);
 			//create flow thumbnail
-			var dataUrlFlow = createThumbnail(image, file.length, 300, true);
+			var FLOW_SIZE = 263;
+			var dataUrlFlow = createThumbnail(image, file.length, FLOW_SIZE, true);
 			
 			pics[id.toString()].original = dataUrl;
 			pics[id.toString()].flow = dataUrlFlow;

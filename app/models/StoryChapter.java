@@ -31,6 +31,7 @@ public class StoryChapter extends Model implements JsonMappable {
 	@Column(nullable = false)
 	public String name;
 	
+	public String description;
 	
 	public Integer startYear;
 	public Integer endYear;
@@ -55,6 +56,7 @@ public class StoryChapter extends Model implements JsonMappable {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("id", id);
 		map.put("name", name);
+		map.put("description", description);
 		map.put("startYear", JsonHelper.getValueOrNull(startYear));
 		map.put("endYear", JsonHelper.getValueOrNull(endYear));
 		map.put("ordering", ordering);
@@ -81,6 +83,10 @@ public class StoryChapter extends Model implements JsonMappable {
 			if (newName == null)
 				return false;
 			name = newName;
+		}
+		if (node.has("description")) {
+			String newDescription = JsonHelper.getNonEmptyString(node,"description");
+			description = newDescription;
 		}
 		if (node.has("ordering")) {
 			Long newOrdering = JsonHelper.getLong(node,"ordering");
