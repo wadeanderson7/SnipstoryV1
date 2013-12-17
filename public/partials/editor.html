@@ -1,9 +1,8 @@
 <nav>
-<h2>Chapters</h2>
-<ul>
-  <li ng-repeat="chapter in story.chapters | orderBy:ordering" ng-class="{selected: curChapter.id==chapter.id}">
-    <a href="javascript:void(0);" ng-click="setChapter($index)">{{chapter.name}}</a>
-  </li>
+<div class="btn-group">
+  <button ng-repeat="chapter in story.chapters | orderBy:ordering" class="btn" ng-class="{'btn-primary': curChapter.id==chapter.id}"
+     ng-click="setChapter($index)">{{chapter.name}}</button>
+</div>
 <a href="#/toc">Table of Contents</a>
 <button class="btn btn-primary" ng-click="addItem()">Add Snippet</button>
 <p ng-if="numUploading()">Uploading... ({{numUploading()}})</p>

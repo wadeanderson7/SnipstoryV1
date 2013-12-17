@@ -1,15 +1,17 @@
 @(user: User)
 
-<header>
- <h1>SnipStory</h1>
- <nav>
-  <ul class="mainNav">
-   <li><a href="@routes.Application.index()">Editor</a></li>
+<header> 
+ <nav class="navbar">
+  <div class="navbar-inner">
+   <p class="brand">SnipStory</p>
+  <ul class="nav">
+   <li class="active"><a href="@routes.Application.index()">Editor</a></li>
   </ul>
-  <span>@user.name (@user.email)</span>
-  <ul class="userNav">
+  <!-- <span class="navbar-text">@user.name (@user.email)</span> -->
+  <ul class="nav pull-right">
    <li><a href="#" ng-click="">Profile</a></li>
    <li><a href="@routes.Application.logout()">Logout</a></li>
   </ul>
+  </div>
  </nav>
 </header>

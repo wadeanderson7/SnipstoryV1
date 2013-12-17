@@ -15,3 +15,7 @@
 .selected {
 	font-weight:bold;
 }
+
+.pageView {
+	position:fixed;max-height:100%;overflow-y:auto;
+}
