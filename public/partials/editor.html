@@ -8,7 +8,7 @@
 <span class="pull-right" ng-if="numUploading()">Uploading... ({{numUploading()}})</span>
 </nav>
 
-<aside class="pagesList">
+<aside class="pagesList pagesListFixed">
 <ul>
   <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">
   <div class="pageActions"><div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a></div>
@@ -18,19 +18,23 @@
   <li><button class="btn" ng-click="addPage()">Add a page...</button></li>
 </ul>
 </aside>
-
+<div class="pagesColumnSpacer"></div>
 <article class="pageView">
   <section ng-repeat="page in curChapter.pages">
     <header>
       <h3>{{page.name}}</h3>
       <p>{{page.description}}</p>
     </header>
-    <div class="snippet" ng-repeat="item in page.items">
-      <div><a href="javascript:void(0);" ng-click="editItem($parent.$index, $index, item.id)">Edit</a>
-      <a href="javascript:void(0);" ng-click="deleteItem($parent.$index, $index, item.id)">Delete</a></div>
-      <img ng-if="item.picture" width="263" height="263" ng-src="{{getPicUrl(item.picture,'flow')}}" />
-      <img ng-if="item.localImageId" ng-src="{{getLocalPic(item.localImageId,'flow')}}" />
-      <p>{{item.description || '&nbsp;'}}</p>
+    <div class="pageContainer">
+    <div class="pageContent">
+      <div class="snippet" ng-repeat="item in page.items">
+        <div><a href="javascript:void(0);" ng-click="editItem($parent.$index, $index, item.id)">Edit</a>
+        <a href="javascript:void(0);" ng-click="deleteItem($parent.$index, $index, item.id)">Delete</a></div>
+        <img ng-if="item.picture" width="263" height="263" ng-src="{{getPicUrl(item.picture,'flow')}}" />
+        <img ng-if="item.localImageId" ng-src="{{getLocalPic(item.localImageId,'flow')}}" />
+        <p>{{item.description || '&nbsp;'}}</p>
+      </div>
+    </div>
     </div>
   </section>
 </article>

@@ -17,7 +17,6 @@
 	margin-left: -1px;
 	margin-right: -1px;
 	padding: 15px;
-	offset
 }
 
 .pageView header h3 {
@@ -64,15 +63,15 @@
 }
 
 aside {
-	float: left;
+	vertical-align:top;
 	position: fixed;
 }
 
 .pageView {
 	padding-left: 0px;
 	padding-right: 10px;
-	width: 977px;
-	float: right;
+	display: table-cell;
+	vertical-align:top;
 }
 
 .modal textarea {
@@ -90,8 +89,16 @@ aside {
 }
 
 .pagesList {
+}
+
+.pagesListFixed {
 	width: 251px;
 	float: left;
+}
+
+.pagesColumnSpacer {
+	width: 251px;
+	display: table-cell;
 }
 
 .pagesList li {
@@ -118,11 +125,52 @@ aside {
 	top: -15px;
 }
 
+.pagesListNoWrap li {
+	border: 1px solid black;
+	text-align: center;
+	border-radius: 4px;
+	font-size: 1.5em;
+	padding: 20px;
+	display: inline-block;
+}
+
 .pageActions {
 	position: absolute;
+}
+
+.smallPageActions {
+	position: absolute;
+}
+
+.smallPageActions div {
+	position: relative;
+	font-size: 0.6em;
+	text-align: left;
+	left: -10px;
+	top: -20px;
 }
 
 .centerable-block {
 	display: inline-block;
 	text-align: left;
+}
+
+.pageContent {
+	display: inline-block;
+}
+
+.pageContainer {
+	text-align: center;
+}
+
+.scroll {
+	overflow-y: auto;
+	height: 600px
+}
+
+.column {
+	display: table-cell;
+	padding-left: 10px;
+	padding-right: 10px;
+	vertical-align: top;
 }

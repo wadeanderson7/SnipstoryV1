@@ -3,14 +3,17 @@
 <span class="pull-right" ng-if="numUploading()">Uploading... ({{numUploading()}})</span>
 <span class="navHeader">Table of Contents</span>
 </nav>
-<h2>Chapters</h2>
+<div class="pagesList pagesListFixed scroll">
 <ul>
   <li ng-repeat="chapter in story.chapters" ng-class="{selected: chapter.id==curChapter.id}">
-    <a href="javascript:void(0);" ng-click="setChapter($index)">{{chapter.name}}</a>
-    <div><a ng-if="story.chapters.length > 1" href="javascript:void(0);" ng-click="deleteChapter(chapter.id, $index)">Delete</a></div>
+    <div class="pageActions"><div><a ng-if="story.chapters.length > 1" href="javascript:void(0);" ng-click="deleteChapter(chapter.id, $index)">Delete</a></div></div>
+    <a href="javascript:void(0);" ng-click="setChapter($index)">{{chapter.name}}</a>    
   </li>
   <li><button class="btn" ng-click="addChapter()">Add a chapter...</button></li>
 </ul>
+</div>
+
+<div class="column">
 <h2>{{curChapter.name}}</h2>
 <label>Edit name: </label><input type="text" ng-model="curChapter.name" ng-blur="saveChapter()" ng-change="dirty()"/>
 <div>
@@ -19,16 +22,22 @@
 </div>
 <label>From: </label><input type="text" ng-model="curChapter.startYear" placeholder="year" ng-blur="saveChapter()" ng-change="dirty()" />
 <label>To: </label><input type="text" ng-model="curChapter.endYear" placeholder="year" ng-blur="saveChapter()" ng-change="dirty()" />
-  
-<h3>Pages</h3>
-<ul>
-  <li ng-repeat="page in curChapter.pages">
-    {{page.name}} ({{page.items.length}} Snippet{{(page.items.length != 1)? 's' : ''}})
-    <div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a>
-      <a ng-if="curChapter.pages.length > 1" href="javascript:void(0);" ng-click="deletePage(page.id, $index)">Delete</a></div>
-  </li>
-</ul>
+</div>
 
+<div class="column">
+<div class="pagesListNoWrap">
+	<h3>Pages</h3>
+	<ul>
+	  <li ng-repeat="page in curChapter.pages">
+	    <div class="smallPageActions"><div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a>
+	      <a ng-if="curChapter.pages.length > 1" href="javascript:void(0);" ng-click="deletePage(page.id, $index)">Delete</a></div>
+	    </div>
+	    {{page.name}} ({{page.items.length}} Snippet{{(page.items.length != 1)? 's' : ''}})
+	  </li>
+	</ul>
+	</div>
+</div>
+</div>
 
 <script type="text/ng-template" id="confirmDeleteChapter.html">
     <div class="modal-body">
