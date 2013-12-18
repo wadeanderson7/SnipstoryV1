@@ -174,3 +174,8 @@ aside {
 	padding-right: 10px;
 	vertical-align: top;
 }
+
+.fullWidthColumns {
+	display: table;
+	width: 100%;
+}
