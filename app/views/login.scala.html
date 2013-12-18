@@ -20,9 +20,11 @@
 
 @main("SnipStory", scripts) {
 
-	@staticnavbar()
+	@staticnavbar("login")
+	<div class="text-center">
+	<div class="centerable-block">
 	@helper.form(routes.Application.authenticate, 'onsubmit -> "return loginCheck(this)") {
-	   <h1>Sign In</h1>
+	   <h2>Sign In</h2>
 		@if(loginForm.hasGlobalErrors) {
 		    <p class="error">
 		        @loginForm.globalError.message
@@ -41,8 +43,10 @@
 	   </p>
 	   <p>
 	       <input type="hidden" name="passwordHash">
-	       <button type="submit">Sign in</button>
+	       <button class="btn" type="submit">Sign in</button>
 	   </p>
 	}
 	<a href="@routes.Application.accountRecover">Forgot your password?</a>
+	</div>
+	</div>
 }        

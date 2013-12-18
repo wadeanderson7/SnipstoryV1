@@ -1,14 +1,16 @@
-@()
+@(active : String)
 <header>
- <nav>
-  <ul class="mainNav">
-   <li><a href="@routes.Application.landing()">Home</a></li>
-   <li><a href="@routes.Application.about()">About Us</a></li>
+ <nav class="navbar">
+  <div class="navbar-inner">
+  <span class="brand">SnipStory</span>
+  <ul class="nav">
+   <li class="@(if(active=="landing") "active" else "")"><a href="@routes.Application.landing()">Home</a></li>
+   <li class="@(if(active=="about") "active" else "")"><a href="@routes.Application.about()">About Us</a></li>
   </ul>
-  <h1>SnipStory</h1>
-  <ul class="userNav">
-   <li><a href="@routes.Application.register()">Register</a></li>
-   <li><a href="@routes.Application.login()">Sign In</a></li>
+  <ul class="nav pull-right">
+   <li class="@(if(active=="register") "active" else "")"><a href="@routes.Application.register()">Register</a></li>
+   <li class="@(if(active=="login") "active" else "")"><a href="@routes.Application.login()">Sign In</a></li>
   </ul>
+  </div>
  </nav>
 </header>

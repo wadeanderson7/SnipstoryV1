@@ -28,7 +28,7 @@
     <div class="snippet" ng-repeat="item in page.items">
       <div><a href="javascript:void(0);" ng-click="editItem($parent.$index, $index, item.id)">Edit</a>
       <a href="javascript:void(0);" ng-click="deleteItem($parent.$index, $index, item.id)">Delete</a></div>
-      <img ng-if="item.picture" ng-src="{{getPicUrl(item.picture,'flow')}}" />
+      <img ng-if="item.picture" width="263" height="263" ng-src="{{getPicUrl(item.picture,'flow')}}" />
       <img ng-if="item.localImageId" ng-src="{{getLocalPic(item.localImageId,'flow')}}" />
       <p>{{item.description || '&nbsp;'}}</p>
     </div>

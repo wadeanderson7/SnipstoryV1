@@ -91,6 +91,7 @@ aside {
 
 .pagesList {
 	width: 251px;
+	float: left;
 }
 
 .pagesList li {
@@ -119,4 +120,9 @@ aside {
 
 .pageActions {
 	position: absolute;
+}
+
+.centerable-block {
+	display: inline-block;
+	text-align: left;
 }
