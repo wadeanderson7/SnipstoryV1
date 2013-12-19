@@ -13,7 +13,7 @@
   <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">
   <div class="pageActions"><div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a></div>
       <div><a ng-if="curChapter.pages.length > 1" href="javascript:void(0);" ng-click="deletePage(page.id, $index)">Delete</a></div></div>
-    <a href="javascript:void(0);" ng-click="setPageIdx($index)">{{page.name}}</a>
+    <a href="javascript:void(0);" ng-click="setPageIdx($index, page.id)">{{page.name}}</a>
   </li>
   <li><button class="btn" ng-click="addPage()">Add a page...</button></li>
 </ul>
@@ -21,7 +21,7 @@
 <div class="fullWidthColumns">
 <div class="pagesColumnSpacer"></div>
 <article class="pageView">
-  <section ng-repeat="page in curChapter.pages">
+  <section ng-repeat="page in curChapter.pages" id="{{page.id}}">
     <header>
       <h3>{{page.name}}</h3>
       <p>{{page.description}}</p>

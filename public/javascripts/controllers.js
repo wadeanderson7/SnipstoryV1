@@ -35,8 +35,17 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     		$scope.pageIdx = 0;
     };
     
-    $scope.setPageIdx = function setPageIdx(idx) {
+    $scope.setPageIdx = function setPageIdx(idx, pageId) {
     	$scope.pageIdx = idx;
+    	scrollTo(pageId);
+    };
+    
+    function scrollTo(id) {
+    	var scrollPos = $("#" + id).offset().top - 100;
+    	$('html, body').animate({
+            scrollTop: scrollPos
+        }, 250);
+    	//$('html, body').scrollTop(scrollPos);
     };
     
     $scope.getPicUrl = function getPicUrl(picture, thumbType) {
