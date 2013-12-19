@@ -8,9 +8,10 @@
 <span class="pull-right" ng-if="numUploading()">Uploading... ({{numUploading()}})</span>
 </nav>
 
+<div scroll-spy>
 <aside class="pagesList pagesListFixed">
 <ul>
-  <li ng-repeat="page in curChapter.pages" ng-class="{selected: $index==pageIdx}">
+  <li ng-repeat="page in curChapter.pages" index="{{$index}}" ng-class="{selected: $index==pageIdx}" spy="p{{page.id}}">
   <div class="pageActions"><div><a href="javascript:void(0);" ng-click="editPage(page.id, $index)">Edit</a></div>
       <div><a ng-if="curChapter.pages.length > 1" href="javascript:void(0);" ng-click="deletePage(page.id, $index)">Delete</a></div></div>
     <a href="javascript:void(0);" ng-click="setPageIdx($index, page.id)">{{page.name}}</a>
@@ -21,14 +22,14 @@
 <div class="fullWidthColumns">
 <div class="pagesColumnSpacer"></div>
 <article class="pageView">
-  <section ng-repeat="page in curChapter.pages" id="{{page.id}}">
+  <section ng-repeat="page in curChapter.pages" id="p{{page.id}}">
     <header>
       <h3>{{page.name}}</h3>
       <p>{{page.description}}</p>
     </header>
     <div class="pageContainer">
     <div class="pageContent">
-      <div class="snippet" ng-repeat="item in page.items">
+      <div class="snippet" ng-repeat="item in page.items" id="i{{item.id}}">
         <div><a href="javascript:void(0);" ng-click="editItem($parent.$index, $index, item.id)">Edit</a>
         <a href="javascript:void(0);" ng-click="deleteItem($parent.$index, $index, item.id)">Delete</a></div>
         <img ng-if="item.picture" width="263" height="263" ng-src="{{getPicUrl(item.picture,'flow')}}" />
@@ -38,7 +39,11 @@
     </div>
     </div>
   </section>
+  <!-- Hack to get scrollspy to work right with selecting page -->
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 </article>
+</div>
 </div>
 
 

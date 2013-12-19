@@ -1,19 +1,13 @@
-var snipStoryControllers = angular.module('snipStoryControllers', ['ui.bootstrap', 'snipStoryServices']);
+var snipStoryControllers = angular.module('snipStoryControllers', ['ui.bootstrap', 'snipStoryServices','jobFoundryDirectives']);
 
 snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'imageHandler','storyService',
   function ($scope, $http, $modal, imageHandler, storyService) {
 	storyService.getStory(function(story) {
 		$scope.story = story;
 		$scope.curChapter = story.chapters[0];
-		$scope.pageIdx = 0; //TODO: update with scroll
+		$scope.pageIdx = 0; //updates with scroll?
 	});
-	
-	/*$http.get('/mystory/all').success(function(data) {
-	  $scope.story = data;
-	  $scope.curChapter = data.chapters[0];
-	  $scope.pageIdx = 0;
-	}); //TODO?: move querying/holding story into service?*/
-	
+
 	$(window).unload(function() {
 		if (imageHandler.syncInProgress())
 			return "Syncing is not complete. Leaving the page now will cause errors.";
@@ -37,15 +31,6 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     
     $scope.setPageIdx = function setPageIdx(idx, pageId) {
     	$scope.pageIdx = idx;
-    	scrollTo(pageId);
-    };
-    
-    function scrollTo(id) {
-    	var scrollPos = $("#" + id).offset().top - 100;
-    	$('html, body').animate({
-            scrollTop: scrollPos
-        }, 250);
-    	//$('html, body').scrollTop(scrollPos);
     };
     
     $scope.getPicUrl = function getPicUrl(picture, thumbType) {
@@ -64,6 +49,8 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     };
     
     $scope.addItem = function() {
+    	var pageIdx = $(".selected").attr("index");
+    	//var pageIdx = $scope.pageIdx;
     	var addSnippetModal = $modal.open({
     		templateUrl: 'addSnippetDialog.html',
     		controller: 'AddSnippetDialogCtrl',
@@ -72,7 +59,6 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
     	
     	addSnippetModal.result.then(function (result) {   		
     		//create item
-    		var pageIdx = $scope.pageIdx;
     		var page = $scope.curChapter.pages[pageIdx];
     		var items = page.items;
     		var ordering = ORDER_INTERVAL;
@@ -87,6 +73,9 @@ snipStoryControllers.controller('EditorCtrl', ['$scope', '$http', '$modal', 'ima
 				if (!imageHandler.assignWaitingPicToItem(data.id)) {
 					imageHandler.addItemWaitingForPic(result.picId, data.id);
 				}
+				
+				//HACK: scroll to new item after timeout
+				//window.setTimeout(scrollTo("i" + data.id), 2000);
 				
 			}).error(function(data, status, headers, config) {
 				//TODO: add error handler of some sort
