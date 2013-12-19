@@ -157,6 +157,7 @@ aside {
 
 .pageContent {
 	display: inline-block;
+	text-align: left;
 }
 
 .pageContainer {
