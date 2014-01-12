@@ -2,7 +2,71 @@
 
 @main("SnipStory") {
 
-	@staticnavbar("landing")
-	<p>Create your story, one snippet at a time</p>
-	<p>TODO: landing page</p>
+	<!-- @staticnavbar("landing") -->
+	 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/home.css")">
+	 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
+	<div class="home">
+		<header>
+			<div class="content">
+				<div class="center">
+					<div class="links1">
+						<a href="">Home</a>
+						<!-- <a href="">About Us</a> -->
+					</div>
+					<div class="logo"></div>
+					<div class="links2">
+						<a href="/register">Sign Up</a>
+						<a href="/login">Log In</a>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="content">
+			<div class="carousel">
+			
+			<div class="calltoaction">
+				Create your <br>
+				<div class="largetext">STORY</div><br>
+				one snippet at a time
+			</div>
+			</div>
+		</div>
+		<div class="content">
+			<section class="subscribe">
+				<div class="video">
+					<iframe width="560" height="315" src="//www.youtube.com/embed/0416vgHMiRg" frameborder="0" allowfullscreen></iframe>
+				</div>
+				<div class="signup">
+					<div>Tell me more!</div>
+					<input type="text"></input>
+					<div class="button">sign up</div>
+				</div>
+
+			</section>
+			<section class="features">
+				<div class="feature">
+					<div class="icon print"></div>
+					<div class="title">Simple to Print</div>
+					<div class="description">
+						Creating hard copies of your digital memories couldn't be simpler. Print specific events or all of them. Print it yourself or let us do it and we'll ship it to you for free.
+					</div> 
+				</div>
+				<div class="feature">
+					<div class="icon organize"></div>
+					<div class="title">Intuitively Organized</div>
+					<div class="description">
+						We let you organize your memories the same way that you remember them. Arrange your memories based on what makes sense to you, not based on the sizes of the shoeboxes in your attic. 
+					</div> 
+				</div>
+				<div class="feature">
+					<div class="icon share"></div>
+					<div class="title">Easy to Share</div>
+					<div class="description">
+						<br>
+						No one likes to play alone, so share your events with friends and family through social media or email. Or link events together with your friends and family to create stories collaboratively. 
+					</div> 
+				</div>
+			</section>
+		</div>
+	</div>
 }
