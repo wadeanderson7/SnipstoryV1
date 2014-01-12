@@ -3,8 +3,8 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.landing()
-GET     /home                       controllers.Application.landing()
+GET     /							controllers.Application.landing()
+GET     /home		                controllers.Application.index()
 GET     /about                      controllers.Application.about()
 GET     /register                   controllers.Application.register()
 GET     /login                      controllers.Application.login()

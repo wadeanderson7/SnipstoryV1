@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 # back up database
 function backupDB {
@@ -17,7 +17,7 @@ git pull origin master
 # enter in git credentials
 
 function restartSnipStory {
-	cd $HOME/SnipStoryV1
+	cd $HOME/SnipStoryBeta
 	_pid=$(cat RUNNING_PID)
 	# Reads the password from stdin
 	echo "Killing existing process"
